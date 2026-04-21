@@ -1,4 +1,4 @@
-﻿﻿(function () {
+(function () {
   var data = window.DEMO_DATA;
   var root = document.getElementById('app');
 
@@ -8,7 +8,7 @@
     '/pc/customer/follow': { title: '跟进记录', module: '客户管理', table: 'customerFollow' },
     '/pc/project/archive': { title: '项目档案', module: '项目管理', table: 'projectArchive' },
     '/pc/project/detail': { title: '项目详情', module: '项目管理', table: null },
-    '/pc/project/cost': { title: '项目造价', module: '项目管理', table: 'projectCost' },
+    '/pc/project/cost': { title: '项目报价', module: '项目管理', table: 'projectCost' },
     '/pc/project/workorder-detail': { title: '工单详情', module: '项目管理', table: null },
     '/pc/project/survey-workorder': { title: '工勘工单', module: '项目管理', table: 'workorder' },
     '/pc/project/construction-workorder': { title: '施工工单', module: '项目管理', table: 'workorder' },
@@ -33,7 +33,7 @@
     '/pc/asset/outbound': { title: '出库记录', module: '设备资产管理', table: 'inventory' },
     '/pc/asset/alarm': { title: '告警记录', module: '设备资产管理', table: 'alarm' },
     '/pc/finance/investor': { title: '投资方', module: '财务管理', table: 'finance' },
-    '/pc/finance/profit': { title: '项目利润', module: '财务管理', table: 'finance' },
+    '/pc/finance/profit': { title: '项目毛利', module: '财务管理', table: 'finance' },
     '/pc/finance/receipt': { title: '回款记录', module: '财务管理', table: 'finance' },
     '/pc/finance/payment': { title: '付款记录', module: '财务管理', table: 'finance' },
     '/pc/finance/invoice': { title: '开票记录', module: '财务管理', table: 'finance' },
@@ -42,8 +42,8 @@
     '/pc/system/department': { title: '部门管理', module: '系统管理', table: 'systemUser' },
     '/pc/system/dictionary': { title: '字典管理', module: '系统管理', table: 'systemUser' },
     '/app/home': { title: '首页', module: 'APP', table: null },
-    '/app/project-cost': { title: '项目造价', module: 'APP', table: null },
-    '/app/project-cost/detail': { title: '造价详情', module: 'APP', table: null },
+    '/app/project-cost': { title: '项目报价', module: 'APP', table: null },
+    '/app/project-cost/detail': { title: '报价详情', module: 'APP', table: null },
     '/app/purchase-order': { title: '采购单', module: 'APP', table: null },
     '/app/purchase-order/detail': { title: '采购详情', module: 'APP', table: null },
     '/app/device-receive': { title: '设备领用', module: 'APP', table: null },
@@ -110,7 +110,10 @@
       currentAppMaintenanceDetailId: null,
       currentAppMaintenanceDetailMode: 'view',
       currentAppMaintenanceDraft: null,
-      appMaintenanceMoreOpen: false
+      appMaintenanceMoreOpen: false,
+      dashboardAnalysis: {
+        periodEnd: currentPeriodMonth()
+      }
     },
     customerArchive: {
       list: (data.customerArchiveList || []).map(function (item) { return Object.assign({}, item); }),
@@ -182,7 +185,7 @@
     },
     vehicleLog: {
       list: (data.vehicleLogList || []).map(function (item) { return Object.assign({}, item); }),
-      filters: { plate: '', user: '', status: '' },
+      filters: { plate: '', user: '' },
       modal: null,
       nextId: (data.vehicleLogList || []).length + 1
     },
@@ -529,7 +532,7 @@
     projectProfit: {
       route: '/pc/finance/profit',
       eyebrow: '财务管理',
-      title: '项目利润',
+      title: '项目毛利',
       intro: '自动展示项目收入、成本、毛利和毛利率，支撑经营分析和预警展示。',
       createLabel: '',
       idPrefix: 'LR-',
@@ -542,7 +545,7 @@
         { key: 'income', label: '项目收入' },
         { key: 'cost', label: '动态成本' },
         { key: 'grossProfit', label: '毛利' },
-        { key: 'margin', label: '毛利率' },
+
         { key: 'warning', label: '预警状态', badge: true }
       ],
       form: [
@@ -550,7 +553,7 @@
         { key: 'income', label: '项目收入', type: 'text', required: true, placeholder: '' },
         { key: 'cost', label: '动态成本', type: 'text', required: true, placeholder: '' },
         { key: 'grossProfit', label: '毛利', type: 'text', required: true, placeholder: '' },
-        { key: 'margin', label: '毛利率', type: 'text', required: true, placeholder: '' },
+
         { key: 'warning', label: '预警状态', type: 'text', required: true, placeholder: '' }
       ],
       actions: ['view']
@@ -580,7 +583,7 @@
         { key: 'contractId', label: '合同', type: 'select', required: true, options: function () { return (getContractState().list || []).map(function (item) { return { value: item.id, label: item.id + '｜' + (item.projectName || '-') }; }); }, placeholder: '请选择合同' },
         { key: 'projectName', label: '关联项目', type: 'text', required: true, placeholder: '' },
         { key: 'date', label: '回款日期', type: 'date', required: true, placeholder: '' },
-        { key: 'method', label: '回款类型', type: 'select', required: true, options: function () { return ['订金', '尾款']; }, placeholder: '请选择回款类型' },
+        { key: 'method', label: '回款类型', type: 'select', required: true, options: function () { return ['预付款', '进度款', '尾款']; }, placeholder: '请选择回款类型' },
         { key: 'payerName', label: '付款方', type: 'text', required: true, placeholder: '请输入付款方' },
         { key: 'payerAccount', label: '付款账号', type: 'text', placeholder: '请输入付款账号' },
         { key: 'amount', label: '回款金额', type: 'number', required: true, placeholder: '请输入回款金额' },
@@ -1058,8 +1061,8 @@
     var filters = state.filters;
     return state.list.filter(function (item) {
       return (!filters.plate || safeText(item.plate).indexOf(filters.plate) > -1) &&
-        (!filters.user || item.user === filters.user) &&
-        (!filters.status || item.status === filters.status);
+        (!filters.user || item.user === filters.user);
+
     });
   }
 
@@ -1488,7 +1491,7 @@
     projectProfit: {
       route: '/pc/finance/profit',
       eyebrow: '财务管理',
-      title: '项目利润',
+      title: '项目毛利',
       intro: '自动展示项目收入、成本、毛利和毛利率，支撑经营分析和预警展示。',
       createLabel: '',
       idPrefix: 'LR-',
@@ -1501,7 +1504,7 @@
         { key: 'income', label: '项目收入' },
         { key: 'cost', label: '动态成本' },
         { key: 'grossProfit', label: '毛利' },
-        { key: 'margin', label: '毛利率' },
+
         { key: 'warning', label: '预警状态', badge: true }
       ],
       form: [
@@ -1509,7 +1512,7 @@
         { key: 'income', label: '项目收入', type: 'text', required: true, placeholder: '' },
         { key: 'cost', label: '动态成本', type: 'text', required: true, placeholder: '' },
         { key: 'grossProfit', label: '毛利', type: 'text', required: true, placeholder: '' },
-        { key: 'margin', label: '毛利率', type: 'text', required: true, placeholder: '' },
+
         { key: 'warning', label: '预警状态', type: 'text', required: true, placeholder: '' }
       ],
       actions: ['view']
@@ -1539,7 +1542,7 @@
         { key: 'contractId', label: '合同', type: 'select', required: true, options: function () { return (getContractState().list || []).map(function (item) { return { value: item.id, label: item.id + '｜' + (item.projectName || '-') }; }); }, placeholder: '请选择合同' },
         { key: 'projectName', label: '关联项目', type: 'text', required: true, placeholder: '' },
         { key: 'date', label: '回款日期', type: 'date', required: true, placeholder: '' },
-        { key: 'method', label: '回款类型', type: 'select', required: true, options: function () { return ['订金', '尾款']; }, placeholder: '请选择回款类型' },
+        { key: 'method', label: '回款类型', type: 'select', required: true, options: function () { return ['预付款', '进度款', '尾款']; }, placeholder: '请选择回款类型' },
         { key: 'payerName', label: '付款方', type: 'text', required: true, placeholder: '请输入付款方' },
         { key: 'payerAccount', label: '付款账号', type: 'text', placeholder: '请输入付款账号' },
         { key: 'amount', label: '回款金额', type: 'number', required: true, placeholder: '请输入回款金额' },
@@ -1930,7 +1933,7 @@
     if (!availableBrands.length && selectedBrand) {
       availableBrands = [{ value: selectedBrand.brand, label: selectedBrand.brand }];
     }
-    return '<div class="modal-mask" data-action="model-modal-close"><div class="modal-card customer-modal model-modal" data-stop-close="1"><div class="modal-header"><div><h3>' + title + '</h3><p>维护品牌下设备型号信息</p></div><button class="icon-btn" data-action="model-modal-close">×</button></div><form id="model-form" class="modal-body"><div class="modal-grid modal-grid-2"><label class="field modal-field"><span>分类 <em>*</em></span><select name="category" ' + (readOnly ? 'disabled ' : '') + '>' + optionHTML(data.modelOptions.categories, item.category || (selectedBrand ? selectedBrand.category : ''), '请选择分类') + '</select></label><label class="field modal-field"><span>品牌 <em>*</em></span><select name="brand" ' + (readOnly ? 'disabled ' : '') + '>' + mappedOptionHTML(availableBrands, item.brand || (selectedBrand ? selectedBrand.brand : ''), '请选择品牌') + '</select></label><label class="field modal-field field-span-2"><span>型号 <em>*</em></span><input name="model" ' + (readOnly ? 'disabled ' : '') + 'value="' + escapeHtml(item.model || '') + '" placeholder="请输入型号" /></label></div><div class="modal-footer">' + (readOnly ? '' : '<button type="submit" class="btn primary">保存</button>') + '<button type="button" class="btn secondary" data-action="model-modal-close">关闭</button></div></form></div></div>';
+    return '<div class="modal-mask" data-action="model-modal-close"><div class="modal-card customer-modal model-modal" data-stop-close="1"><div class="modal-header"><div><h3>' + title + '</h3><p>维护品牌下设备型号信息</p></div><button class="icon-btn" data-action="model-modal-close">×</button></div><form id="model-form" class="modal-body"><div class="modal-grid modal-grid-2"><label class="field modal-field"><span>分类 <em>*</em></span><select name="category" ' + (readOnly ? 'disabled ' : '') + '>' + optionHTML(data.modelOptions.categories, item.category || (selectedBrand ? selectedBrand.category : ''), '请选择分类') + '</select></label><label class="field modal-field"><span>品牌 <em>*</em></span><select name="brand" ' + (readOnly ? 'disabled ' : '') + '>' + mappedOptionHTML(availableBrands, item.brand || (selectedBrand ? selectedBrand.brand : ''), '请选择品牌') + '</select></label><label class="field modal-field field-span-2"><span>型号 <em>*</em></span><input name="model" ' + (readOnly ? 'disabled ' : '') + 'value="' + escapeHtml(item.model || '') + '" placeholder="请输入型号" /></label><label class="field modal-field field-span-2"><span>低库存预警</span><input name="lowStockWarning" ' + (readOnly ? 'disabled ' : '') + 'value="' + escapeHtml(item.lowStockWarning || '') + '" placeholder="请输入低库存预警" /></label></div><div class="modal-footer">' + (readOnly ? '' : '<button type="submit" class="btn primary">保存</button>') + '<button type="button" class="btn secondary" data-action="model-modal-close">关闭</button></div></form></div></div>';
   }
 
   function modelManagementPageHTML() {
@@ -2033,6 +2036,7 @@
           category: modelItem.category || '',
           brand: modelItem.brand || '',
           model: modelItem.model || '',
+          lowStockWarning: modelItem.lowStockWarning || '',
           stockStatus: '无库存',
           devices: []
         };
@@ -2046,6 +2050,7 @@
           category: item.category || '',
           brand: item.brand || '',
           model: item.model || '',
+          lowStockWarning: '',
           stockStatus: '有库存',
           devices: []
         };
@@ -2056,6 +2061,7 @@
     return Object.keys(grouped).map(function (key) {
       var row = grouped[key];
       row.idleQty = row.devices.length;
+      row.isLowStockWarning = !!row.lowStockWarning && Number(row.idleQty || 0) <= Number(row.lowStockWarning);
       return row;
     }).filter(function (row) {
       if (filters.brand && safeText(row.brand).indexOf(safeText(filters.brand).trim()) === -1) return false;
@@ -2079,10 +2085,13 @@
 
   function inventoryTableHTML() {
     var rows = getInventoryAggregateRows();
-    return '<div class="panel table-panel customer-table-panel"><div class="panel-header"><div><h3>设备库存列表</h3><p>按型号统计闲置状态设备数量，可查看库存设备清单。</p></div></div><table class="data-table customer-table"><thead><tr><th>分类</th><th>品牌</th><th>型号</th><th>操作</th></tr></thead><tbody>' +
+    return '<div class="panel table-panel customer-table-panel"><div class="panel-header"><div><h3>设备库存列表</h3><p>按型号统计闲置状态设备数量，可查看库存设备清单。</p></div></div><table class="data-table customer-table"><thead><tr><th>分类</th><th>品牌</th><th>型号</th><th>库存数量</th><th>操作</th></tr></thead><tbody>' +
       ((rows.map(function (item) {
-        return '<tr><td>' + escapeHtml(item.category || '-') + '</td><td>' + escapeHtml(item.brand || '-') + '</td><td>' + escapeHtml(item.model || '-') + (item.idleQty ? '<span class="table-inline-note">（' + item.idleQty + '台闲置）</span>' : '') + '</td><td><div class="table-actions"><button class="link-btn" data-action="inventory-stock-list" data-id="' + escapeHtml(item.id) + '">库存清单</button></div></td></tr>';
-      }).join('')) || '<tr><td colspan="4"><div class="empty-state">未查询到符合条件的库存型号</div></td></tr>') +
+        var qtyHtml = item.isLowStockWarning
+          ? '<span class="status warning inventory-low-stock-badge" title="低库存预警：阈值 ' + escapeHtml(item.lowStockWarning) + '">' + escapeHtml(String(item.idleQty || 0)) + '台 · 低库存预警</span>'
+          : escapeHtml(String(item.idleQty || 0)) + '台';
+        return '<tr class="' + (item.isLowStockWarning ? 'inventory-low-stock-row' : '') + '"><td>' + escapeHtml(item.category || '-') + '</td><td>' + escapeHtml(item.brand || '-') + '</td><td>' + escapeHtml(item.model || '-') + '</td><td>' + qtyHtml + '</td><td><div class="table-actions"><button class="link-btn" data-action="inventory-stock-list" data-id="' + escapeHtml(item.id) + '">库存清单</button></div></td></tr>';
+      }).join('')) || '<tr><td colspan="5"><div class="empty-state">未查询到符合条件的库存型号</div></td></tr>') +
       '</tbody></table></div>';
   }
 
@@ -3610,10 +3619,10 @@
 
   function projectProfitTableHTML() {
     var rows = getFilteredProjectProfitRows();
-    return '<div class="panel table-panel customer-table-panel"><div class="panel-header"><div><h3>项目利润列表</h3><p>共 ' + rows.length + ' 个项目，展示合同金额与设备成本形成的利润结果。</p></div></div><table class="data-table customer-table"><thead><tr><th>项目名称</th><th>项目编号</th><th>所属客户</th><th>状态</th><th>利润</th><th>利润率</th><th>操作</th></tr></thead><tbody>' +
+    return '<div class="panel table-panel customer-table-panel"><div class="panel-header"><div><h3>项目毛利列表</h3><p>共 ' + rows.length + ' 个项目，展示合同金额与设备成本形成的利润结果。</p></div></div><table class="data-table customer-table"><thead><tr><th>项目名称</th><th>项目编号</th><th>所属客户</th><th>状态</th><th>利润</th><th>操作</th></tr></thead><tbody>' +
       ((rows.map(function (item) {
-        return '<tr><td>' + escapeHtml(item.projectName || '-') + '</td><td>' + escapeHtml(item.projectCode || '-') + '</td><td>' + escapeHtml(item.customerName || '-') + '</td><td><span class="status ' + badgeClass(item.status || '') + '">' + escapeHtml(item.status || '-') + '</span></td><td>' + escapeHtml(formatMoney(item.profit)) + '</td><td>' + projectProfitRateText(item.profitRate) + '</td><td><div class="table-actions"><button class="link-btn" data-action="project-profit-view" data-id="' + escapeHtml(item.id) + '">查看</button></div></td></tr>';
-      }).join('')) || '<tr><td colspan="7"><div class="empty-state">未查询到符合条件的项目利润数据</div></td></tr>') +
+        return '<tr><td>' + escapeHtml(item.projectName || '-') + '</td><td>' + escapeHtml(item.projectCode || '-') + '</td><td>' + escapeHtml(item.customerName || '-') + '</td><td><span class="status ' + badgeClass(item.status || '') + '">' + escapeHtml(item.status || '-') + '</span></td><td>' + escapeHtml(formatMoney(item.profit)) + '</td><td>' + formatMoney(item.productionValue) + '</td><td><div class="table-actions"><button class="link-btn" data-action="project-profit-view" data-id="' + escapeHtml(item.id) + '">查看</button></div></td></tr>';
+      }).join('')) || '<tr><td colspan="7"><div class="empty-state">未查询到符合条件的项目毛利数据</div></td></tr>') +
       '</tbody></table></div>';
   }
 
@@ -3625,11 +3634,11 @@
     var modal = getManagedState('projectProfit').modal;
     if (!modal || !modal.item) return '';
     var item = modal.item;
-    return '<div class="modal-mask" data-action="project-profit-modal-close"><div class="modal-card customer-modal" data-stop-close="1"><div class="modal-header"><div><h3>项目利润详情</h3><p>' + escapeHtml(item.projectName || '-') + ' · ' + escapeHtml(item.projectCode || '-') + '</p></div><button class="icon-btn" data-action="project-profit-modal-close">×</button></div><div class="modal-body"><div class="modal-section"><h4>项目基础信息</h4><div class="detail-grid"><div class="detail-item"><span>项目名称</span><strong>' + escapeHtml(item.projectName || '-') + '</strong></div><div class="detail-item"><span>项目编号</span><strong>' + escapeHtml(item.projectCode || '-') + '</strong></div><div class="detail-item"><span>所属客户</span><strong>' + escapeHtml(item.customerName || '-') + '</strong></div><div class="detail-item"><span>项目状态</span><strong><span class="status ' + badgeClass(item.status || '') + '">' + escapeHtml(item.status || '-') + '</span></strong></div></div></div><div class="detail-overview-grid compact"><div class="stat-card"><div class="stat-title">合同金额</div><div class="stat-value detail-stat">' + escapeHtml(formatMoney(item.contractAmount)) + '</div></div><div class="stat-card"><div class="stat-title">回款金额</div><div class="stat-value detail-stat">' + escapeHtml(formatMoney(item.receiptAmount)) + '</div></div><div class="stat-card"><div class="stat-title">设备成本</div><div class="stat-value detail-stat">' + escapeHtml(formatMoney(item.deviceCost)) + '</div></div><div class="stat-card"><div class="stat-title">利润</div><div class="stat-value detail-stat">' + escapeHtml(formatMoney(item.profit)) + '</div></div><div class="stat-card detail-item-full"><div class="stat-title">利润率</div><div class="stat-value detail-stat">' + projectProfitRateText(item.profitRate) + '</div></div></div></div><div class="modal-footer"><button type="button" class="btn secondary" data-action="project-profit-modal-close">关闭</button></div></div></div>';
+    return '<div class="modal-mask" data-action="project-profit-modal-close"><div class="modal-card customer-modal" data-stop-close="1"><div class="modal-header"><div><h3>项目毛利详情</h3><p>' + escapeHtml(item.projectName || '-') + ' · ' + escapeHtml(item.projectCode || '-') + '</p></div><button class="icon-btn" data-action="project-profit-modal-close">×</button></div><div class="modal-body"><div class="modal-section"><h4>项目基础信息</h4><div class="detail-grid"><div class="detail-item"><span>项目名称</span><strong>' + escapeHtml(item.projectName || '-') + '</strong></div><div class="detail-item"><span>项目编号</span><strong>' + escapeHtml(item.projectCode || '-') + '</strong></div><div class="detail-item"><span>所属客户</span><strong>' + escapeHtml(item.customerName || '-') + '</strong></div><div class="detail-item"><span>项目状态</span><strong><span class="status ' + badgeClass(item.status || '') + '">' + escapeHtml(item.status || '-') + '</span></strong></div></div></div><div class="detail-overview-grid compact"><div class="stat-card"><div class="stat-title">合同金额</div><div class="stat-value detail-stat">' + escapeHtml(formatMoney(item.contractAmount)) + '</div></div><div class="stat-card"><div class="stat-title">回款金额</div><div class="stat-value detail-stat">' + escapeHtml(formatMoney(item.receiptAmount)) + '</div></div><div class="stat-card"><div class="stat-title">设备成本</div><div class="stat-value detail-stat">' + escapeHtml(formatMoney(item.deviceCost)) + '</div></div><div class="stat-card"><div class="stat-title">毛利</div><div class="stat-value detail-stat">' + escapeHtml(formatMoney(item.profit)) + '</div></div><div class="stat-card detail-item-full"><div class="stat-title">生产产值</div><div class="stat-value detail-stat">' + formatMoney(item.productionValue) + '</div></div></div></div><div class="modal-footer"><button type="button" class="btn secondary" data-action="project-profit-modal-close">关闭</button></div></div></div>';
   }
 
   function projectProfitPageHTML() {
-    return '<div class="sub-hero customer-hero"><div><div class="eyebrow">财务管理</div><h2>项目利润</h2><p>展示项目利润、利润率及合同与成本构成，支持多条件检索和详情查看。</p></div></div>' + projectProfitFiltersHTML() + projectProfitTableHTML() + projectProfitModalHTML();
+    return '<div class="sub-hero customer-hero"><div><div class="eyebrow">财务管理</div><h2>项目毛利</h2><p>展示项目毛利、利润率及合同与成本构成，支持多条件检索和详情查看。</p></div></div>' + projectProfitFiltersHTML() + projectProfitTableHTML() + projectProfitModalHTML();
   }
 
   function openProjectProfitModal(id) {
@@ -4088,6 +4097,7 @@
       category: selectedBrand ? selectedBrand.category : '',
       brand: selectedBrand ? selectedBrand.brand : '',
       model: '',
+      lowStockWarning: '',
       remark: ''
     };
     state.modal = { mode: mode, item: item };
@@ -4156,6 +4166,7 @@
       category: category,
       brand: brand,
       model: modelName,
+      lowStockWarning: safeText(formData.get('lowStockWarning')).trim(),
       remark: modal.item.remark || '',
       unit: modal.item.unit || '台',
       status: modal.item.status || '启用'
@@ -4249,7 +4260,7 @@
       receiptContractSelectHTML(item.contractId || '', readOnly) +
       '<label class="field modal-field"><span>关联项目 <em>*</em></span><input name="projectName" data-receipt-project readonly value="' + escapeHtml(item.projectName || '') + '" placeholder="选择合同后自动回显" /></label>' +
       '<label class="field modal-field"><span>回款日期 <em>*</em></span><input type="date" name="date" ' + (readOnly ? 'disabled ' : '') + 'value="' + escapeHtml(item.date || '') + '" /></label>' +
-      '<label class="field modal-field"><span>回款类型 <em>*</em></span><select name="method" ' + (readOnly ? 'disabled ' : '') + '>' + optionHTML(['订金', '尾款'], item.method || '', '请选择回款类型') + '</select></label>' +
+      '<label class="field modal-field"><span>回款类型 <em>*</em></span><select name="method" ' + (readOnly ? 'disabled ' : '') + '>' + optionHTML(['预付款', '进度款', '尾款'], item.method || '', '请选择回款类型') + '</select></label>' +
       '<label class="field modal-field"><span>付款方 <em>*</em></span><input name="payerName" ' + (readOnly ? 'disabled ' : '') + 'value="' + escapeHtml(item.payerName || '') + '" placeholder="请输入付款方" /></label>' +
       '<label class="field modal-field"><span>付款账号</span><input name="payerAccount" ' + (readOnly ? 'disabled ' : '') + 'value="' + escapeHtml(item.payerAccount || '') + '" placeholder="请输入付款账号" /></label>' +
       '<label class="field modal-field"><span>回款金额 <em>*</em></span><input type="number" step="0.01" min="0" name="amount" ' + (readOnly ? 'disabled ' : '') + 'value="' + escapeHtml(item.amount || '') + '" placeholder="请输入回款金额" /></label>' +
@@ -4372,6 +4383,7 @@
         surveyCount: surveyCount,
         constructionCount: constructionCount,
         maintenanceCount: maintenanceCount,
+        productionValue: formatPlainMoney((surveyCount * 12000) + (constructionCount * 68000) + (maintenanceCount * 18000)),
         totalCount: surveyCount + constructionCount + maintenanceCount
       };
     }).filter(function (item) {
@@ -4414,10 +4426,10 @@
 
   function performanceEngineerTableHTML() {
     var rows = buildEngineerPerformanceRows();
-    return '<div class="panel table-panel customer-table-panel"><div class="panel-header"><div><h3>工程业绩列表</h3><p>共 ' + rows.length + ' 名工程人员，展示当期工勘、施工与运维任务完成量。</p></div></div><table class="data-table customer-table"><thead><tr><th>姓名</th><th>手机号</th><th>小组</th><th>工勘数量</th><th>施工数量</th><th>运维数量</th></tr></thead><tbody>' +
+    return '<div class="panel table-panel customer-table-panel"><div class="panel-header"><div><h3>工程业绩列表</h3><p>共 ' + rows.length + ' 名工程人员，展示当期工勘、施工、生产产值与运维任务完成量。</p></div></div><table class="data-table customer-table"><thead><tr><th>姓名</th><th>手机号</th><th>小组</th><th>工勘数量</th><th>施工数量</th><th>生产产值</th><th>运维数量</th></tr></thead><tbody>' +
       (rows.map(function (item) {
-        return '<tr><td>' + escapeHtml(item.name) + '</td><td>' + escapeHtml(item.phone || '-') + '</td><td>' + escapeHtml(item.team || '-') + '</td><td>' + escapeHtml(String(item.surveyCount)) + '</td><td>' + escapeHtml(String(item.constructionCount)) + '</td><td>' + escapeHtml(String(item.maintenanceCount)) + '</td></tr>';
-      }).join('') || '<tr><td colspan="6"><div class="empty-state">未查询到符合条件的工程业绩数据</div></td></tr>') +
+        return '<tr><td>' + escapeHtml(item.name) + '</td><td>' + escapeHtml(item.phone || '-') + '</td><td>' + escapeHtml(item.team || '-') + '</td><td>' + escapeHtml(String(item.surveyCount)) + '</td><td>' + escapeHtml(String(item.constructionCount)) + '</td><td>' + escapeHtml(item.productionValue || '-') + '</td><td>' + escapeHtml(String(item.maintenanceCount)) + '</td></tr>';
+      }).join('') || '<tr><td colspan="7"><div class="empty-state">未查询到符合条件的工程业绩数据</div></td></tr>') +
       '</tbody></table></div>';
   }
 
@@ -4999,16 +5011,16 @@
     ].join('');
   }
 
-  function statCardsHTML() {
-    return '<div class="stats-grid dashboard-stats">' + data.dashboard.metricCards.map(function (item, index) {
-      var extraClass = item.tone ? ' tone-' + item.tone : '';
-      return '<button class="stat-card stat-card-link glow-' + ((index % 3) + 1) + extraClass + '" data-route="' + item.route + '"><div class="stat-title">' + item.label + '</div><div class="stat-value">' + item.value + '</div><div class="stat-desc">' + item.sub + '</div></button>';
+  function statCardsHTML(wrapperClass) {
+    return '<div class="stats-grid dashboard-stats' + (wrapperClass ? ' ' + wrapperClass : '') + '">' + data.dashboard.metricCards.map(function (item, index) {
+      var toneClass = item.tone ? ' tone-' + item.tone : '';
+      return '<button class="stat-card stat-card-link glow-' + ((index % 3) + 1) + toneClass + '" data-route="' + item.route + '"><div class="stat-title">' + item.label + '</div><div class="stat-value">' + item.value + '</div><div class="stat-desc">' + item.sub + '</div></button>';
     }).join('') + '</div>';
   }
 
   function noticeHTML() {
     return [
-      '<div class="panel notice-panel"><div class="panel-header"><div><h3>重点提醒</h3><p>面向领导汇报的经营与风险摘要</p></div></div>',
+      '<div class="panel notice-panel"><div class="panel-header"><div><h3>重点提醒</h3></div></div>',
       '<div class="notice-list">',
       data.notices.map(function (item) {
         return '<div class="notice-item ' + item.level + '"><div><strong>' + item.title + '</strong><span>' + item.time + '</span></div><button class="link-btn" data-route="/pc/asset/alarm">查看详情</button></div>';
@@ -5019,7 +5031,7 @@
 
   function timelineHTML(items, title, subtitle) {
     return [
-      '<div class="panel timeline-panel"><div class="panel-header"><div><h3>' + title + '</h3><p>' + subtitle + '</p></div></div>',
+      '<div class="panel timeline-panel"><div class="panel-header"><div><h3>' + title + '</h3>' + (subtitle ? '<p>' + subtitle + '</p>' : '') + '</div></div>',
       '<div class="timeline">',
       items.map(function (item) {
         return '<div class="timeline-item"><span class="timeline-dot"></span><div class="timeline-time">' + (item.time || item.status || '') + '</div><div class="timeline-content"><strong>' + item.title + '</strong><p>' + (item.tag || item.desc || '') + (item.amount ? ' · ' + item.amount : '') + '</p></div></div>';
@@ -5029,7 +5041,89 @@
   }
 
   function chartPanel(id, title, sub) {
-    return '<div class="panel chart-panel"><div class="panel-header"><div><h3>' + title + '</h3><p>' + sub + '</p></div></div><div class="chart" id="' + id + '"></div></div>';
+    return '<div class="panel chart-panel"><div class="panel-header"><div><h3>' + title + '</h3>' + (sub ? '<p>' + sub + '</p>' : '') + '</div></div><div class="chart" id="' + id + '"></div></div>';
+  }
+
+  function richDashboardChartPanel(config) {
+    return [
+      '<div class="panel chart-panel chart-panel-rich">',
+      '<div class="panel-header panel-header-rich"><div><h3>' + safeText(config.title) + '</h3>' + (config.sub ? '<p>' + safeText(config.sub) + '</p>' : '') + '</div></div>',
+      '<div class="chart chart-rich" id="' + config.id + '"></div>',
+      '</div>'
+    ].join('');
+  }
+
+  function stackedChartPanel(config) {
+    return [
+      '<div class="panel chart-panel chart-panel-stack">',
+      '<div class="panel-header"><div><h3>' + safeText(config.title) + '</h3>' + (config.sub ? '<p>' + safeText(config.sub) + '</p>' : '') + '</div></div>',
+      '<div class="chart-stack">',
+      '<div class="chart chart-stack-main" id="' + config.topId + '"></div>',
+      '<div class="chart-stack-divider"><span>' + safeText(config.bottomTitle || '') + '</span></div>',
+      '<div class="chart chart-stack-sub" id="' + config.bottomId + '"></div>',
+      '</div>',
+      '</div>'
+    ].join('');
+  }
+
+  function dualPieChartPanel(config) {
+    return [
+      '<div class="panel chart-panel dual-pie-panel">',
+      '<div class="panel-header"><div><h3>' + safeText(config.title) + '</h3>' + (config.sub ? '<p>' + safeText(config.sub) + '</p>' : '') + '</div></div>',
+      '<div class="dual-pie-grid">',
+      '<div class="dual-pie-item"><div class="dual-pie-title">' + safeText(config.leftTitle) + '</div><div class="chart dual-pie-chart" id="' + config.leftId + '"></div></div>',
+      '<div class="dual-pie-item"><div class="dual-pie-title">' + safeText(config.rightTitle) + '</div><div class="chart dual-pie-chart" id="' + config.rightId + '"></div></div>',
+      '</div>',
+      '</div>'
+    ].join('');
+  }
+
+  function projectMilestoneHTML(items) {
+    var milestones = items || [];
+    var completedCount = milestones.filter(function (item) { return item.status === 'done'; }).length;
+    var activeIndex = milestones.findIndex(function (item) { return item.status === 'active'; });
+    var progressIndex = activeIndex >= 0 ? activeIndex : completedCount;
+    var progressWidth = milestones.length > 1 ? (progressIndex / (milestones.length - 1)) * 100 : 100;
+    return [
+      '<div class="panel project-milestone-panel">',
+      '<div class="project-milestone-track"><span class="project-milestone-fill" style="width:' + progressWidth + '%"></span></div>',
+      '<div class="project-milestone-list">',
+      milestones.map(function (item) {
+        return '<div class="project-milestone-item ' + (item.status || 'pending') + '">' +
+          '<div class="project-milestone-dot"><span class="project-milestone-icon">' + ((item.status === 'done') ? '✓' : '') + '</span></div>' +
+          '<div class="project-milestone-label">' + escapeHtml(item.label || '-') + '</div>' +
+          '<div class="project-milestone-date">' + escapeHtml(item.date || '-') + '</div>' +
+        '</div>';
+      }).join(''),
+      '</div>',
+      '</div>'
+    ].join('');
+  }
+
+  function contractAnalysisPanel(config) {
+    var cards = (config.cards || []).map(function (item) {
+      return '<div class="contract-mini-card"><span>' + safeText(item.label) + '</span><strong>' + safeText(item.value) + '</strong></div>';
+    }).join('');
+    return [
+      '<div class="panel chart-panel contract-analysis-panel">',
+      '<div class="panel-header"><div><h3>' + safeText(config.title) + '</h3>' + (config.sub ? '<p>' + safeText(config.sub) + '</p>' : '') + '</div></div>',
+      '<div class="contract-analysis-grid">',
+      '<div class="chart contract-analysis-chart" id="' + config.chartId + '"></div>',
+      '<div class="contract-analysis-side">',
+      '<div class="contract-side-title">' + safeText(config.sideTitle || '月度汇总') + '</div>',
+      cards,
+      '</div>',
+      '</div>',
+      '</div>'
+    ].join('');
+  }
+
+  function dashboardHeroHTML() {
+    return [
+      '<div class="hero-banner dashboard-hero">',
+      '<div class="dashboard-hero-main"><div class="dashboard-hero-top"><div class="eyebrow">国企数字化 · 消防工程 · 项目经营驾驶舱</div><div class="hero-actions dashboard-hero-actions"><button class="btn primary" data-route="/pc/project/archive">查看项目全景</button><button class="btn secondary" data-route="/pc/finance/profit">查看经营分析</button></div></div>' + statCardsHTML('dashboard-hero-stats') + '</div>',
+      '</div>'
+    ].join('');
   }
 
   function customerArchiveFiltersHTML() {
@@ -5280,8 +5374,9 @@
     if (!project) {
       return '<div class="panel table-panel"><div class="empty-state">未找到对应项目档案</div></div>';
     }
-    var detail = data.projectDetailData[project.id] || {
-      basicInfo: [
+      var detail = data.projectDetailData[project.id] || {
+        milestones: [],
+        basicInfo: [
         ['项目编号', project.code || '-'],
         ['所属客户', project.customerName || '-'],
         ['项目类型', project.projectType || '-'],
@@ -5290,8 +5385,7 @@
         ['销售人员', project.salesperson || '-'],
         ['合同金额', project.contractAmount || '-'],
         ['实施周期', project.period || '-'],
-        ['当前进度', project.progress || '-'],
-        ['设备数量', (project.deviceCount || 0) + ' 台'],
+          ['设备数量', (project.deviceCount || 0) + ' 台'],
         ['工单数量', (project.workorderCount || 0) + ' 条'],
         ['备注', project.remark || '-']
       ],
@@ -5303,66 +5397,53 @@
     var activeTab = appState.ui.currentProjectDetailTab || 'basic';
     var tabs = [
       { key: 'basic', label: '基本信息' },
-      { key: 'cost', label: '项目造价' },
+      { key: 'cost', label: '项目报价' },
       { key: 'workorder', label: '工单' },
       { key: 'device', label: '设备清单' },
       { key: 'contract', label: '合同信息' }
     ];
-    return [
-      '<div class="sub-hero customer-hero">',
-      '<div><div class="eyebrow">项目管理 · 项目详情</div><h2>' + escapeHtml(project.name) + '</h2><p><span class="detail-code">项目编号：' + escapeHtml(project.code) + '</span><span class="status ' + (project.status === '运营中' ? 'success' : project.status === '冻结' ? 'danger' : 'warning') + '">' + escapeHtml(project.status) + '</span></p></div>',
-      '<div class="sub-actions"><button class="btn secondary" data-route="/pc/project/archive">返回项目档案</button><button class="btn primary" data-action="project-edit" data-id="' + project.id + '">编辑</button></div></div>',
-      '<div class="detail-overview-grid compact">' +
-      '<div class="stat-card"><div class="stat-title">所属客户</div><div class="stat-value detail-stat">' + escapeHtml(project.customerName || '-') + '</div></div>' +
-      '<div class="stat-card"><div class="stat-title">项目类型</div><div class="stat-value detail-stat">' + escapeHtml(project.projectType || '-') + '</div></div>' +
-      '<div class="stat-card"><div class="stat-title">项目负责人</div><div class="stat-value detail-stat">' + escapeHtml(project.manager || '-') + '</div></div>' +
-      '<div class="stat-card"><div class="stat-title">项目区域</div><div class="stat-value detail-stat">' + escapeHtml(project.area || '-') + '</div></div>' +
-      '<div class="stat-card"><div class="stat-title">合同金额</div><div class="stat-value detail-stat">' + escapeHtml(project.contractAmount || '-') + '</div></div>' +
-      '<div class="stat-card"><div class="stat-title">实施周期</div><div class="stat-value detail-stat">' + escapeHtml(project.period || '-') + '</div></div>' +
-      '<div class="stat-card"><div class="stat-title">当前进度</div><div class="stat-value detail-stat">' + escapeHtml(project.progress || '-') + '</div></div>' +
-      '<div class="stat-card"><div class="stat-title">设备数量</div><div class="stat-value detail-stat">' + escapeHtml(String(project.deviceCount || 0)) + '</div></div>' +
-      '<div class="stat-card"><div class="stat-title">工单数量</div><div class="stat-value detail-stat">' + escapeHtml(String(project.workorderCount || 0)) + '</div></div>' +
-      '</div>',
-      '<div class="panel table-panel customer-table-panel"><div class="detail-tabs">' +
-      tabs.map(function (tab) {
-        return '<button class="detail-tab ' + (activeTab === tab.key ? 'active' : '') + '" data-action="project-detail-tab" data-tab="' + tab.key + '">' + tab.label + '</button>';
+      return [
+        '<div class="sub-hero customer-hero">',
+        '<div><div class="eyebrow">项目管理 · 项目详情</div><h2>' + escapeHtml(project.name) + '</h2><p><span class="detail-code">项目编号：' + escapeHtml(project.code) + '</span><span class="status ' + (project.status === '运营中' ? 'success' : project.status === '冻结' ? 'danger' : 'warning') + '">' + escapeHtml(project.status) + '</span></p></div>',
+        '<div class="sub-actions"><button class="btn secondary" data-route="/pc/project/archive">返回项目档案</button><button class="btn primary" data-action="project-edit" data-id="' + project.id + '">编辑</button></div></div>',
+        projectMilestoneHTML(detail.milestones),
+        '<div class="panel table-panel customer-table-panel"><div class="detail-tabs">' +
+        tabs.map(function (tab) {
+          return '<button class="detail-tab ' + (activeTab === tab.key ? 'active' : '') + '" data-action="project-detail-tab" data-tab="' + tab.key + '">' + tab.label + '</button>';
       }).join('') +
       '</div><div class="detail-tab-body">' + renderProjectDetailTab(project, detail, activeTab) + '</div></div>'
     ].join('');
   }
 
   function renderProjectDetailTab(project, detail, activeTab) {
+    function section(title, desc, content, className) {
+      return '<div class="project-detail-section-card' + (className ? ' ' + className : '') + '"><div class="project-detail-section-head"><div><h4>' + escapeHtml(title) + '</h4><p>' + escapeHtml(desc) + '</p></div></div><div class="project-detail-section-body">' + content + '</div></div>';
+    }
     if (activeTab === 'basic') {
-      return '<div class="detail-grid">' + detail.basicInfo.map(function (item) {
+      return section('基础信息', '查看项目基础档案、负责人及实施范围', '<div class="detail-grid">' + detail.basicInfo.map(function (item) {
         return '<div class="detail-item ' + (item[0] === '备注' ? 'detail-item-full' : '') + '"><span>' + escapeHtml(item[0]) + '</span><strong>' + escapeHtml(item[1]) + '</strong></div>';
-      }).join('') + '</div>';
+      }).join('') + '</div>', 'project-detail-section-basic');
     }
     if (activeTab === 'cost') {
-      return '<div class="detail-grid">' +
-        '<div class="detail-item"><span>目标成本</span><strong>' + escapeHtml(detail.cost.totalBudget) + '</strong></div>' +
-        '<div class="detail-item"><span>动态成本</span><strong>' + escapeHtml(detail.cost.dynamicCost) + '</strong></div>' +
-        '<div class="detail-item"><span>材料成本</span><strong>' + escapeHtml(detail.cost.materialCost) + '</strong></div>' +
-        '<div class="detail-item"><span>人工成本</span><strong>' + escapeHtml(detail.cost.laborCost) + '</strong></div>' +
-        '<div class="detail-item"><span>毛利率</span><strong>' + escapeHtml(detail.cost.grossMargin) + '</strong></div>' +
-        '<div class="detail-item"><span>预警状态</span><strong><span class="status ' + (detail.cost.warning === '正常' ? 'success' : 'danger') + '">' + escapeHtml(detail.cost.warning) + '</span></strong></div>' +
-      '</div>';
+      return section('报价明细', '同步项目报价页面的明细清单与合计金额', projectCostDetailTableHTML(project.id), 'project-detail-section-cost');
     }
     if (activeTab === 'workorder') {
-      return '<table class="data-table"><thead><tr><th>编号</th><th>类型</th><th>创建人</th><th>创建时间</th><th>状态</th></tr></thead><tbody>' +
+      return section('工单记录', '展示当前项目相关工单及处理状态', '<table class="data-table project-detail-table project-workorder-table"><thead><tr><th>编号</th><th>类型</th><th>创建人</th><th>创建时间</th><th>状态</th></tr></thead><tbody>' +
         (detail.workorders || []).map(function (item) {
           return '<tr><td><button class="text-link" data-action="project-drill" data-drill="workorder" data-id="' + project.id + '">' + escapeHtml(item.code) + '</button></td><td>' + escapeHtml(item.type) + '</td><td>' + escapeHtml(item.creator) + '</td><td>' + escapeHtml(item.createTime) + '</td><td><span class="status ' + ((item.overdue || item.status === '已超期') ? 'danger' : item.status === '处理中' ? 'warning' : 'success') + '">' + escapeHtml(item.status) + (item.overdue ? ' · 超期' : '') + '</span></td></tr>';
-        }).join('') + '</tbody></table>';
+        }).join('') + '</tbody></table>', 'project-detail-section-workorder');
     }
     if (activeTab === 'device') {
-      return '<table class="data-table"><thead><tr><th>设备编号</th><th>设备名称</th><th>型号</th><th>状态</th></tr></thead><tbody>' +
+      return section('设备清单', '查看项目设备的分类、品牌、型号及在线状态', '<table class="data-table project-detail-table project-device-table"><thead><tr><th>设备编号</th><th>设备名称</th><th>分类</th><th>品牌</th><th>型号</th><th>安装位置</th><th>状态</th></tr></thead><tbody>' +
         (detail.devices || []).map(function (item) {
-          return '<tr><td><button class="text-link" data-action="project-drill" data-drill="asset" data-id="' + project.id + '">' + escapeHtml(item.code) + '</button></td><td>' + escapeHtml(item.name) + '</td><td>' + escapeHtml(item.model) + '</td><td><span class="status ' + (item.status === '在线运行' ? 'success' : item.status === '安装调试' ? 'warning' : 'danger') + '">' + escapeHtml(item.status) + '</span></td></tr>';
-        }).join('') + '</tbody></table>';
+          var deviceStatusClass = item.status === '在线' ? 'success' : item.status === '离线' ? 'danger' : 'warning';
+          return '<tr><td><button class="text-link" data-action="project-drill" data-drill="asset" data-id="' + project.id + '">' + escapeHtml(item.code) + '</button></td><td>' + escapeHtml(item.name) + '</td><td>' + escapeHtml(item.category || '-') + '</td><td>' + escapeHtml(item.brand || '-') + '</td><td>' + escapeHtml(item.model) + '</td><td>' + escapeHtml(item.installLocation || '-') + '</td><td><span class="status ' + deviceStatusClass + '">' + escapeHtml(item.status) + '</span></td></tr>';
+        }).join('') + '</tbody></table>', 'project-detail-section-device');
     }
-    return '<table class="data-table"><thead><tr><th>合同编号</th><th>合同名称</th><th>金额</th><th>签订日期</th><th>状态</th></tr></thead><tbody>' +
+    return section('合同信息', '查看项目合同金额、累计开票与累计回款概览', '<table class="data-table project-detail-table project-contract-table"><thead><tr><th>合同编号</th><th>合同名称</th><th>合同金额</th><th>累计开票</th><th>累计回款</th><th>签订日期</th></tr></thead><tbody>' +
       (detail.contracts || []).map(function (item) {
-        return '<tr><td><button class="text-link" data-action="project-drill" data-drill="contract" data-id="' + project.id + '">' + escapeHtml(item.code) + '</button></td><td>' + escapeHtml(item.name) + '</td><td>' + escapeHtml(item.amount) + '</td><td>' + escapeHtml(item.signDate) + '</td><td><span class="status success">' + escapeHtml(item.status) + '</span></td></tr>';
-      }).join('') + '</tbody></table>';
+        return '<tr><td><button class="text-link" data-action="project-drill" data-drill="contract" data-id="' + project.id + '">' + escapeHtml(item.code) + '</button></td><td>' + escapeHtml(item.name) + '</td><td>' + escapeHtml(item.amount) + '</td><td>' + escapeHtml(item.invoiceAmount || '-') + '</td><td>' + escapeHtml(item.receivedAmount || '-') + '</td><td>' + escapeHtml(item.signDate) + '</td></tr>';
+      }).join('') + '</tbody></table>', 'project-detail-section-contract');
   }
 
   function projectArchiveModalHTML() {
@@ -5409,7 +5490,7 @@
       '</div>',
       '<div class="modal-footer">' +
       (readOnly
-        ? '<button type="button" class="btn secondary" data-action="project-drill" data-drill="workorder" data-id="' + item.id + '">工单</button><button type="button" class="btn secondary" data-action="project-drill" data-drill="asset" data-id="' + item.id + '">设备</button><button type="button" class="btn secondary" data-action="project-drill" data-drill="cost" data-id="' + item.id + '">造价</button><button type="button" class="btn secondary" data-action="project-drill" data-drill="contract" data-id="' + item.id + '">合同</button>'
+        ? '<button type="button" class="btn secondary" data-action="project-drill" data-drill="workorder" data-id="' + item.id + '">工单</button><button type="button" class="btn secondary" data-action="project-drill" data-drill="asset" data-id="' + item.id + '">设备</button><button type="button" class="btn secondary" data-action="project-drill" data-drill="cost" data-id="' + item.id + '">报价</button><button type="button" class="btn secondary" data-action="project-drill" data-drill="contract" data-id="' + item.id + '">合同</button>'
         : '<button type="submit" class="btn primary">保存</button>') +
       '<button type="button" class="btn secondary" data-action="project-modal-close">关闭</button>' +
       '</div>',
@@ -5421,7 +5502,7 @@
     var state = getProjectArchiveState();
     return [
       '<div class="sub-hero customer-hero">',
-      '<div><div class="eyebrow">项目管理</div><h2>项目档案</h2><p>统一管理项目层级结构、项目状态、负责人及下钻业务入口，支撑工单、设备、造价、合同协同。</p></div>',
+      '<div><div class="eyebrow">项目管理</div><h2>项目档案</h2><p>统一管理项目层级结构、项目状态、负责人及下钻业务入口，支撑工单、设备、报价、合同协同。</p></div>',
       '<div class="sub-actions"><button class="btn primary" data-action="project-create">新增项目</button><div class="switcher"><button class="switch-btn ' + (state.viewMode === 'tree' ? 'active' : '') + '" data-action="project-view-mode" data-mode="tree">树状视图</button><button class="switch-btn ' + (state.viewMode === 'table' ? 'active' : '') + '" data-action="project-view-mode" data-mode="table">表格视图</button></div></div></div>',
       projectArchiveFiltersHTML(),
       projectArchiveTableHTML(),
@@ -5434,7 +5515,7 @@
     return [
       '<div class="panel filter-panel customer-filter-panel">',
       '<div class="filter-grid project-cost-filter-grid">',
-      '<label class="field"><span>编号</span><input data-cost-filter="id" value="' + escapeHtml(filters.id) + '" placeholder="请输入造价单编号" /></label>',
+      '<label class="field"><span>编号</span><input data-cost-filter="id" value="' + escapeHtml(filters.id) + '" placeholder="请输入报价单编号" /></label>',
       '<label class="field"><span>项目名称</span><input data-cost-filter="projectName" value="' + escapeHtml(filters.projectName) + '" placeholder="请输入项目名称" /></label>',
       '<label class="field"><span>客户名称</span><input data-cost-filter="customerName" value="' + escapeHtml(filters.customerName) + '" placeholder="请输入客户名称" /></label>',
       '<label class="field"><span>审批状态</span><select data-cost-filter="status">' + optionHTML(data.projectCostOptions.statuses, filters.status, '全部状态') + '</select></label>',
@@ -5449,9 +5530,9 @@
     var rows = getFilteredProjectCosts();
     return [
       '<div class="panel table-panel customer-table-panel">',
-      '<div class="panel-header"><div><h3>造价单列表</h3><p>共 ' + rows.length + ' 条造价单，展示成本构成与审批流转状态</p></div></div>',
+      '<div class="panel-header"><div><h3>报价单列表</h3><p>共 ' + rows.length + ' 条报价单，展示成本构成与审批流转状态</p></div></div>',
       '<table class="data-table customer-table"><thead><tr>',
-      '<th>造价单编号</th><th>项目名称</th><th>客户名称</th><th>创建人</th><th>创建时间</th><th>状态</th><th>操作</th>',
+      '<th>报价单编号</th><th>项目名称</th><th>客户名称</th><th>创建人</th><th>创建时间</th><th>状态</th><th>操作</th>',
       '</tr></thead><tbody>',
       rows.map(function (item) {
         return '<tr>' +
@@ -5468,15 +5549,59 @@
           '<button class="link-btn danger-link" data-action="cost-revoke" data-id="' + item.id + '">撤销</button>' +
           '</div></td>' +
         '</tr>';
-      }).join('') || '<tr><td colspan="7"><div class="empty-state">未查询到符合条件的造价单</div></td></tr>',
+      }).join('') || '<tr><td colspan="7"><div class="empty-state">未查询到符合条件的报价单</div></td></tr>',
       '</tbody></table></div>'
     ].join('');
   }
 
-  function renderCostDetailRows(details, readOnly) {
+  function costBrandOptionsHTML(value) {
+    return optionHTML([
+      '海湾',
+      '青鸟',
+      '安消智联',
+      '宇视',
+      '华三',
+      '通用'
+    ], value || '', '请选择品牌');
+  }
+
+  function costModelOptionsHTML(value) {
+    return optionHTML([
+      'GST-LD-8301',
+      'JBF5111',
+      'TX3000-4G',
+      'AI-CAM-TD600',
+      'SW-16GE-POE',
+      'RVV-2×1.5'
+    ], value || '', '请选择型号');
+  }
+
+  function costDetailBrandModelByName(name) {
+    var mapping = {
+      '用户信息传输装置': { brand: '安消智联', model: 'TX3000-4G' },
+      '一体式压力传感器': { brand: '海湾', model: 'YL-20/1.6MPa' },
+      '一体式液位传感器': { brand: '海湾', model: 'YW-10M' },
+      '离岗检测摄像机': { brand: '宇视', model: 'AI-CAM-LG300' },
+      '消防通道监测摄像机': { brand: '宇视', model: 'AI-CAM-TD600' },
+      '电气火灾报警器': { brand: '青鸟', model: 'JBF5111' },
+      '挂箱': { brand: '通用', model: 'BX-01' },
+      '交换机': { brand: '华三', model: 'SW-16GE-POE' },
+      '电源线': { brand: '通用', model: 'RVV-2×1.5' },
+      '网线': { brand: '通用', model: 'CAT6' },
+      '网络服务（宽带）': { brand: '通用', model: '企业宽带' }
+    };
+    return mapping[name] || { brand: '', model: '' };
+  }
+
+  function renderCostDetailRows(details, readOnly, includeBrandModel) {
     return (details || []).map(function (item, index) {
+      var fallbackBrandModel = costDetailBrandModelByName(item.name);
+      var brandText = item.brand || ((item.brandModel || '').split(' ')[0] || '') || fallbackBrandModel.brand;
+      var modelText = item.model || ((item.brandModel || '').split(' ').slice(1).join(' ') || '') || fallbackBrandModel.model;
       return '<tr>' +
         '<td>' + escapeHtml(item.name) + '</td>' +
+        (includeBrandModel ? '<td>' + (readOnly ? escapeHtml(brandText || '-') : '<select class="mini-input cost-brand-select" name="detail-brand-' + index + '">' + costBrandOptionsHTML(brandText) + '</select>') + '</td>' : '') +
+        (includeBrandModel ? '<td>' + (readOnly ? escapeHtml(modelText || '-') : '<select class="mini-input cost-model-select" name="detail-model-' + index + '">' + costModelOptionsHTML(modelText) + '</select>') + '</td>' : '') +
         '<td>' + escapeHtml(item.unit) + '</td>' +
         '<td>' + (readOnly ? escapeHtml(item.qty) : '<input class="mini-input" data-cost-calc="qty" data-index="' + index + '" name="detail-qty-' + index + '" value="' + escapeHtml(item.qty) + '" />') + '</td>' +
         '<td>' + (readOnly ? escapeHtml(item.price) : '<input class="mini-input" data-cost-calc="price" data-index="' + index + '" name="detail-price-' + index + '" value="' + escapeHtml(item.price) + '" />') + '</td>' +
@@ -5490,6 +5615,20 @@
     return (details || []).reduce(function (sum, item) {
       return sum + (Number(item.amount) || 0);
     }, 0);
+  }
+
+  function projectCostDetailTableHTML(projectId) {
+    var costItem = (getProjectCostState().list || []).find(function (item) {
+      return item.projectId === projectId;
+    }) || (data.projectCostList || []).find(function (item) {
+      return item.projectId === projectId;
+    });
+    if (!costItem || !(costItem.details || []).length) {
+      return '<div class="empty-state">暂无报价明细</div>';
+    }
+    var details = costItem.details || [];
+    var totalAmount = calcCostTotal(details);
+    return '<div class="cost-table-wrap"><table class="data-table cost-detail-table project-detail-table project-cost-table"><thead><tr><th>报价明细</th><th>品牌</th><th>型号</th><th>单位</th><th>数量</th><th>单价</th><th>合价</th><th>备注</th></tr></thead><tbody>' + renderCostDetailRows(details, true, true) + '<tr class="cost-total-row"><td colspan="6">合计</td><td colspan="2">¥<span data-cost-total>' + escapeHtml(totalAmount.toFixed(2)) + '</span></td></tr></tbody></table></div>';
   }
 
   function approvalTimelineHTML(records) {
@@ -5522,7 +5661,7 @@
         time: item.createTime || '',
         operator: item.creator || '系统管理员',
         action: '创建',
-        remark: '新建造价单。',
+        remark: '新建报价单。',
         rawAction: '创建'
       });
     }
@@ -5614,7 +5753,7 @@
     if (!modal) return '';
     var item = modal.item || {};
     var readOnly = modal.mode === 'view';
-    var title = modal.mode === 'create' ? '新增造价单' : modal.mode === 'edit' ? '编辑造价单' : modal.mode === 'approve' ? '造价单审批' : '造价单详情';
+    var title = modal.mode === 'create' ? '新增报价单' : modal.mode === 'edit' ? '编辑报价单' : modal.mode === 'approve' ? '报价单审批' : '报价单详情';
     var projectOptions = mappedOptionHTML(getAllProjectItems(getProjectArchiveState().tree).map(function (project) {
       return { value: project.id, label: project.name };
     }), item.projectId || '', '请选择项目');
@@ -5628,7 +5767,7 @@
       '<label class="field modal-field"><span>项目 <em>*</em></span><select name="projectId" ' + (readOnly || modal.mode === 'approve' ? 'disabled ' : '') + '>' + projectOptions + '</select></label>',
       '<label class="field modal-field"><span>审批状态</span><input disabled value="' + escapeHtml(item.status || '草稿') + '" /></label>',
       '</div>',
-      '<div class="cost-table-wrap"><table class="data-table cost-detail-table"><thead><tr><th>造价明细</th><th>单位</th><th>数量</th><th>单价</th><th>合价</th><th>备注</th></tr></thead><tbody>' + renderCostDetailRows(item.details || [], readOnly || modal.mode === 'approve') + '<tr class="cost-total-row"><td colspan="4">合计</td><td colspan="2">¥<span data-cost-total>' + escapeHtml(totalAmount.toFixed(2)) + '</span></td></tr></tbody></table></div>',
+      '<div class="cost-table-wrap"><table class="data-table cost-detail-table"><thead><tr><th>报价明细</th><th>品牌</th><th>型号</th><th>单位</th><th>数量</th><th>单价</th><th>合价</th><th>备注</th></tr></thead><tbody>' + renderCostDetailRows(item.details || [], readOnly || modal.mode === 'approve', true) + '<tr class="cost-total-row"><td colspan="6">合计</td><td colspan="2">¥<span data-cost-total>' + escapeHtml(totalAmount.toFixed(2)) + '</span></td></tr></tbody></table></div>',
       detailFlowRecordHTML('流转记录', '展示单据创建、编辑、审批等流转过程', costFlowTimelineHTML(item)),
       (modal.mode === 'approve'
         ? '<div class="approval-box"><label class="field field-span-2"><span>审批意见</span><textarea name="approvalRemark" placeholder="同意可填写审批意见，驳回请填写原因"></textarea></label></div>'
@@ -5647,8 +5786,8 @@
   function projectCostPageHTML() {
     return [
       '<div class="sub-hero customer-hero">',
-      '<div><div class="eyebrow">项目管理</div><h2>项目造价</h2><p>统一管理项目成本构成、设备材料明细及造价审批状态，体现工程造价业务特征。</p></div>',
-      '<div class="sub-actions"><button class="btn primary" data-action="cost-create">新增造价单</button></div></div>',
+      '<div><div class="eyebrow">项目管理</div><h2>项目报价</h2><p>统一管理项目成本构成、设备材料明细及报价审批状态，体现工程报价业务特征。</p></div>',
+      '<div class="sub-actions"><button class="btn primary" data-action="cost-create">新增报价单</button></div></div>',
       projectCostFiltersHTML(),
       projectCostTableHTML(),
       projectCostModalHTML()
@@ -5738,6 +5877,22 @@
     return fallbackUnit || '-';
   }
 
+  function inspectionWaterRows() {
+    return [
+      { name: '消防水池', required: true },
+      { name: '高位水箱', required: true },
+      { name: '室内消火栓泵', required: false },
+      { name: '室外消火栓泵', required: false },
+      { name: '喷淋泵', required: false },
+      { name: '喷淋末端', required: true }
+    ];
+  }
+
+  function inspectionWaterRowRequired(name) {
+    var row = inspectionWaterRows().find(function (item) { return item.name === name; });
+    return !row || row.required !== false;
+  }
+
   function inspectionLogFieldHTML(label, value, required) {
     return '<div class="inspection-log-field"><div class="inspection-log-label">' + escapeHtml(label) + (required ? ' <em>*</em>' : '') + '</div><div class="inspection-log-value">' + escapeHtml(inspectionReadonlyText(value)) + '</div></div>';
   }
@@ -5755,13 +5910,9 @@
     var newDevices = logSheet.newDevices || [];
     var constructionItems = logSheet.constructionItems || [];
     var number = logSheet.number || item.id || (type === 'construction' ? 'CTBXGK-0000002' : 'CTBXGK-0000001');
-    var defaultWaterRows = [
-      { name: '消防水池', qty: '-', valve: '-', signal: '-', position: '-', remark: '-' },
-      { name: '高位水箱', qty: '-', valve: '-', signal: '-', position: '-', remark: '-' },
-      { name: '室内消火栓泵', qty: '-', valve: '-', signal: '-', position: '-', remark: '-' },
-      { name: '室外消火栓泵', qty: '-', valve: '-', signal: '-', position: '-', remark: '-' },
-      { name: '喷淋泵', qty: '-', valve: '-', signal: '-', position: '-', remark: '-' }
-    ];
+    var defaultWaterRows = inspectionWaterRows().map(function (row) {
+      return { name: row.name, qty: '-', valve: '-', signal: '-', position: '-', remark: '-' };
+    });
     var defaultNewDeviceRows = [
       '用户信息传输装置', '一体式压力传感器', '一体式液位传感器', '离岗检测摄像机', '消防通道监测摄像机',
       '电气火灾报警器', '网络服务（宽带）', '挂箱', '交换机', '电源线', '网线'
@@ -6371,7 +6522,7 @@
       '</div></section>',
       '<section class="inspection-log-section"><div class="inspection-log-section-title">消防水系统</div><div class="inspection-log-table-wrap"><table class="inspection-log-table"><thead><tr><th>设备名称</th><th>数量</th><th>是否有球阀</th><th>信号有无</th><th>位置</th><th>备注</th></tr></thead><tbody>',
       waterRows.map(function (row, index) {
-        return '<tr><td>' + escapeHtml(row.name) + ' <em>*</em><input type="hidden" name="waterName-' + index + '" value="' + escapeHtml(row.name) + '" /></td><td><input class="inspection-log-table-input" name="waterQty-' + index + '" value="' + escapeHtml(row.qty === '-' ? '' : row.qty) + '" /></td><td><select class="inspection-log-table-input" name="waterValve-' + index + '"><option value=""></option><option value="是"' + (row.valve === '是' ? ' selected' : '') + '>是</option><option value="否"' + (row.valve === '否' ? ' selected' : '') + '>否</option></select></td><td><select class="inspection-log-table-input" name="waterSignal-' + index + '"><option value=""></option><option value="有"' + (row.signal === '有' ? ' selected' : '') + '>有</option><option value="无"' + (row.signal === '无' ? ' selected' : '') + '>无</option></select></td><td><input class="inspection-log-table-input" name="waterPosition-' + index + '" value="' + escapeHtml(row.position === '-' ? '' : row.position) + '" /></td><td><input class="inspection-log-table-input" name="waterRemark-' + index + '" value="' + escapeHtml(row.remark === '-' ? '' : row.remark) + '" /></td></tr>';
+        return '<tr><td>' + escapeHtml(row.name) + (inspectionWaterRowRequired(row.name) ? ' <em>*</em>' : '') + '<input type="hidden" name="waterName-' + index + '" value="' + escapeHtml(row.name) + '" /></td><td><input class="inspection-log-table-input" name="waterQty-' + index + '" value="' + escapeHtml(row.qty === '-' ? '' : row.qty) + '" /></td><td><select class="inspection-log-table-input" name="waterValve-' + index + '"><option value=""></option><option value="是"' + (row.valve === '是' ? ' selected' : '') + '>是</option><option value="否"' + (row.valve === '否' ? ' selected' : '') + '>否</option></select></td><td><select class="inspection-log-table-input" name="waterSignal-' + index + '"><option value=""></option><option value="有"' + (row.signal === '有' ? ' selected' : '') + '>有</option><option value="无"' + (row.signal === '无' ? ' selected' : '') + '>无</option></select></td><td><input class="inspection-log-table-input" name="waterPosition-' + index + '" value="' + escapeHtml(row.position === '-' ? '' : row.position) + '" /></td><td><input class="inspection-log-table-input" name="waterRemark-' + index + '" value="' + escapeHtml(row.remark === '-' ? '' : row.remark) + '" /></td></tr>';
       }).join(''),
       '</tbody></table></div></section>',
       '<section class="inspection-log-section"><div class="inspection-log-section-title">新增设备统计</div><div class="inspection-log-table-wrap"><table class="inspection-log-table inspection-log-table-device"><thead><tr><th>序号</th><th>类别</th><th>建设内容</th><th>单位</th><th>数量</th><th>备注</th></tr></thead><tbody>',
@@ -6448,7 +6599,7 @@
       '</div></section>',
       '<section class="mobile-section app-log-fill-section"><div class="section-title"><h4>消防水系统</h4><span>' + waterRows.length + '项</span></div><div class="mobile-cost-detail-grid">' +
       waterRows.map(function (row, index) {
-        return '<div class="mobile-cost-detail-row app-log-fill-list-card"><div class="mobile-cost-detail-row-head"><strong>' + escapeHtml(row.name) + '</strong><span>必填</span></div><input type="hidden" name="waterName-' + index + '" value="' + escapeHtml(row.name) + '" /><div class="mobile-cost-detail-grid">' +
+        return '<div class="mobile-cost-detail-row app-log-fill-list-card"><div class="mobile-cost-detail-row-head"><strong>' + escapeHtml(row.name) + '</strong><span>' + (inspectionWaterRowRequired(row.name) ? '必填' : '') + '</span></div><input type="hidden" name="waterName-' + index + '" value="' + escapeHtml(row.name) + '" /><div class="mobile-cost-detail-grid">' +
           appInspectionLogFormFieldHTML('数量', 'waterQty-' + index, row.qty === '-' ? '' : row.qty) +
           appInspectionLogFormFieldHTML('是否有球阀', 'waterValve-' + index, row.valve === '-' ? '' : row.valve, false, { options: ['', '是', '否'] }) +
           appInspectionLogFormFieldHTML('信号有无', 'waterSignal-' + index, row.signal === '-' ? '' : row.signal, false, { options: ['', '有', '无'] }) +
@@ -6498,7 +6649,8 @@
       existingSheet.constructionRemark = safeText(formData.get('constructionRemark')).trim();
       return existingSheet;
     }
-    var waterRows = ['消防水池', '高位水箱', '室内消火栓泵', '室外消火栓泵', '喷淋泵'].map(function (name, index) {
+    var waterRows = inspectionWaterRows().map(function (row, index) {
+      var name = row.name;
       return {
         name: name,
         qty: safeText(formData.get('waterQty-' + index)).trim(),
@@ -7179,6 +7331,8 @@
       '<label class="field modal-field"><span>小组名称 <em>*</em></span><input name="name" ' + (readOnly ? 'disabled ' : '') + 'value="' + escapeHtml(item.name || '') + '" placeholder="请输入小组名称" /></label>',
       '<label class="field modal-field"><span>负责人 <em>*</em></span><select name="ownerId" ' + (readOnly ? 'disabled ' : '') + '>' + mappedOptionHTML(getEngineerState().list.map(function (person) { return { value: person.id, label: person.name }; }), item.ownerId || '', '请选择负责人') + '</select></label>',
       '<label class="field modal-field"><span>状态</span><select name="status" ' + (readOnly ? 'disabled ' : '') + '>' + optionHTML(data.engineerTeamOptions.statuses, item.status, '请选择状态') + '</select></label>',
+      '<label class="field modal-field"><span>施工人工成本</span><input name="laborCost" ' + (readOnly ? 'disabled ' : '') + 'value="' + escapeHtml(item.laborCost || '') + '" placeholder="请输入施工人工成本（元/台）" /></label>',
+      '<label class="field modal-field"><span>工勘人力成本</span><input name="surveyLaborCost" ' + (readOnly ? 'disabled ' : '') + 'value="' + escapeHtml(item.surveyLaborCost || '') + '" placeholder="请输入工勘人力成本（次）" /></label>',
       '<label class="field modal-field"><span>创建时间</span><input disabled value="' + escapeHtml(item.createTime || '保存后生成') + '" /></label>',
       '<label class="field modal-field field-span-2"><span>描述</span><textarea name="desc" ' + (readOnly ? 'disabled ' : '') + ' placeholder="请输入小组职责描述">' + escapeHtml(item.desc || '') + '</textarea></label>',
       '</div>',
@@ -7210,7 +7364,7 @@
       '<div class="filter-grid team-filter-grid">',
       '<label class="field"><span>车牌号</span><input data-vehicle-filter="plate" value="' + escapeHtml(filters.plate) + '" placeholder="请输入车牌号" /></label>',
       '<label class="field"><span>用车人</span><select data-vehicle-filter="user">' + optionHTML(data.vehicleLogOptions.users, filters.user, '全部用车人') + '</select></label>',
-      '<label class="field"><span>审批状态</span><select data-vehicle-filter="status">' + optionHTML(data.vehicleLogOptions.statuses, filters.status, '全部状态') + '</select></label>',
+
       '<div class="filter-actions"><button class="btn secondary" data-action="vehicle-reset">重置</button><button class="btn primary" data-action="vehicle-search">查询</button></div>',
       '</div></div>'
     ].join('');
@@ -7222,7 +7376,7 @@
       '<div class="panel table-panel customer-table-panel">',
       '<div class="panel-header"><div><h3>车辆使用记录</h3><p>共 ' + rows.length + ' 条车辆使用记录，支持申请、查看、编辑、删除及审批状态管理</p></div></div>',
       '<table class="data-table customer-table"><thead><tr>',
-      '<th>车牌号</th><th>用车人</th><th>事由</th><th>出车时间</th><th>返回时间</th><th>里程</th><th>审批状态</th><th>操作</th>',
+      '<th>车牌号</th><th>用车人</th><th>事由</th><th>出车时间</th><th>返回时间</th><th>里程</th><th>操作</th>',
       '</tr></thead><tbody>',
       rows.map(function (item) {
         return '<tr>' +
@@ -7232,14 +7386,14 @@
           '<td>' + escapeHtml(item.departTime) + '</td>' +
           '<td>' + escapeHtml(item.returnTime || '-') + '</td>' +
           '<td>' + escapeHtml(item.mileage || '-') + '</td>' +
-          '<td><span class="status ' + badgeClass(item.status) + '">' + escapeHtml(item.status) + '</span></td>' +
+
           '<td><div class="table-actions">' +
           '<button class="link-btn" data-action="vehicle-view" data-id="' + item.id + '">查看</button>' +
           '<button class="link-btn" data-action="vehicle-edit" data-id="' + item.id + '">编辑</button>' +
           '<button class="link-btn danger-link" data-action="vehicle-delete" data-id="' + item.id + '">删除</button>' +
           '</div></td>' +
         '</tr>';
-      }).join('') || '<tr><td colspan="8"><div class="empty-state">未查询到符合条件的车辆使用记录</div></td></tr>',
+      }).join('') || '<tr><td colspan="7"><div class="empty-state">未查询到符合条件的车辆使用记录</div></td></tr>',
       '</tbody></table></div>'
     ].join('');
   }
@@ -7256,12 +7410,12 @@
       '<div class="modal-header"><div><h3>' + title + '</h3><p>维护工程用车申请、现场出车和返回信息，支撑工程车辆调度留痕。</p></div><button class="icon-btn" data-action="vehicle-modal-close">×</button></div>',
       '<form id="vehicle-form" class="modal-body">',
       '<div class="modal-grid modal-grid-2">',
-      '<label class="field modal-field"><span>车牌号 <em>*</em></span><select name="plate" ' + (readOnly ? 'disabled ' : '') + '>' + optionHTML(data.vehicleLogOptions.plates, item.plate, '请选择车牌号') + '</select></label>',
-      '<label class="field modal-field"><span>用车人 <em>*</em></span><select name="user" ' + (readOnly ? 'disabled ' : '') + '>' + optionHTML(data.vehicleLogOptions.users, item.user, '请选择用车人') + '</select></label>',
+      '<label class="field modal-field"><span>车牌号 <em>*</em></span><input name="plate" ' + (readOnly ? 'disabled ' : '') + 'value="' + escapeHtml(item.plate || '') + '" placeholder="请输入车牌号" /></label>',
+      '<label class="field modal-field"><span>用车人 <em>*</em></span><input name="user" ' + (readOnly ? 'disabled ' : '') + 'value="' + escapeHtml(item.user || '') + '" placeholder="请输入用车人" /></label>',
       '<label class="field modal-field"><span>出车时间 <em>*</em></span><input type="datetime-local" name="departTime" ' + (readOnly ? 'disabled ' : '') + 'value="' + escapeHtml((item.departTime || '').replace(' ', 'T')) + '" /></label>',
       '<label class="field modal-field"><span>返回时间</span><input type="datetime-local" name="returnTime" ' + (readOnly ? 'disabled ' : '') + 'value="' + escapeHtml(item.returnTime && item.returnTime !== '-' ? item.returnTime.replace(' ', 'T') : '') + '" /></label>',
       '<label class="field modal-field"><span>里程</span><input name="mileage" ' + (readOnly ? 'disabled ' : '') + 'value="' + escapeHtml(item.mileage && item.mileage !== '-' ? item.mileage : '') + '" placeholder="请输入里程，如 86km" /></label>',
-      '<label class="field modal-field"><span>审批状态</span><select name="status" ' + (readOnly ? 'disabled ' : '') + '>' + optionHTML(data.vehicleLogOptions.statuses, item.status, '请选择审批状态') + '</select></label>',
+
       '<label class="field modal-field field-span-2"><span>事由 <em>*</em></span><input name="reason" ' + (readOnly ? 'disabled ' : '') + 'value="' + escapeHtml(item.reason || '') + '" placeholder="请输入用车事由" /></label>',
       '<label class="field modal-field field-span-2"><span>目的地</span><input name="destination" ' + (readOnly ? 'disabled ' : '') + 'value="' + escapeHtml(item.destination || '') + '" placeholder="请输入目的地" /></label>',
       '<label class="field modal-field field-span-2"><span>备注</span><textarea name="remark" ' + (readOnly ? 'disabled ' : '') + ' placeholder="请输入备注信息">' + escapeHtml(item.remark || '') + '</textarea></label>',
@@ -7484,7 +7638,7 @@
       '<div class="panel table-panel customer-table-panel">',
       '<div class="panel-header"><div><h3>合同列表</h3><p>共 ' + rows.length + ' 份合同，支持审批、撤销和完整合同信息查看</p></div></div>',
       '<table class="data-table customer-table"><thead><tr>',
-      '<th>合同编号</th><th>客户</th><th>项目</th><th>状态</th><th>创建人</th><th>创建时间</th><th>操作</th>',
+      '<th>合同编号</th><th>客户</th><th>项目</th><th>合同金额</th><th>状态</th><th>创建人</th><th>创建时间</th><th>操作</th>',
       '</tr></thead><tbody>',
       rows.map(function (item) {
         return '<tr>' +
@@ -7524,7 +7678,7 @@
     return [
       '<div class="modal-mask" data-action="contract-modal-close">',
       '<div class="modal-card contract-modal" data-stop-close="1">',
-      '<div class="modal-header"><div><h3>' + title + '</h3><p>维护合同基础信息、工程概况、工期要求、计价清单及合同造价</p></div><button class="icon-btn" data-action="contract-modal-close">×</button></div>',
+      '<div class="modal-header"><div><h3>' + title + '</h3><p>维护合同基础信息、工程概况、工期要求、计价清单及合同报价</p></div><button class="icon-btn" data-action="contract-modal-close">×</button></div>',
       '<form id="contract-form" class="modal-body">',
       '<div class="modal-section"><h4>基础信息</h4><div class="modal-grid modal-grid-2">' +
       '<label class="field modal-field"><span>发包方 <em>*</em></span><select name="customerId" ' + (readOnly ? 'disabled ' : '') + '>' + customerOptions + '</select></label>' +
@@ -7555,7 +7709,7 @@
         : '<div class="field modal-field contract-attachment-field"><span>附件名称</span><div class="attachment-name-display"><span>' + escapeHtml(attachmentName) + '</span><button type="button" class="icon-btn attachment-download-btn" aria-label="下载附件">⭳</button></div></div>') +
       '</div></div>',
       contractPricingTableHTML(item, readOnly),
-      '<div class="modal-section"><h4>合同造价</h4><div class="modal-grid modal-grid-2">' +
+      '<div class="modal-section"><h4>合同报价</h4><div class="modal-grid modal-grid-2">' +
       amountField('totalAmount', '总价', item.totalAmount) +
       amountField('taxExclusiveAmount', '不含税金额', item.taxExclusiveAmount) +
       amountField('taxAmount', '增值税金额', item.taxAmount) +
@@ -7576,7 +7730,7 @@
   function contractPageHTML() {
     return [
       '<div class="sub-hero customer-hero">',
-      '<div><div class="eyebrow">合同管理</div><h2>合同管理</h2><p>统一维护合同主数据、工程概况、工期要求及合同造价，支持审批和撤销。</p></div>',
+      '<div><div class="eyebrow">合同管理</div><h2>合同管理</h2><p>统一维护合同主数据、工程概况、工期要求及合同报价，支持审批和撤销。</p></div>',
       '<div class="sub-actions"><button class="btn primary" data-action="contract-create">新增合同</button></div></div>',
       contractFiltersHTML(),
       contractTableHTML(),
@@ -7587,7 +7741,7 @@
   function alertListHTML(title, subtitle, items) {
     return [
       '<div class="panel alert-list-panel">',
-      '<div class="panel-header"><div><h3>' + title + '</h3><p>' + subtitle + '</p></div></div>',
+      '<div class="panel-header"><div><h3>' + title + '</h3>' + (subtitle ? '<p>' + subtitle + '</p>' : '') + '</div></div>',
       '<div class="alert-list">',
       items.map(function (item) {
         return '<button class="alert-item" data-route="' + item.route + '">' +
@@ -7601,34 +7755,110 @@
     ].join('');
   }
 
+  function dashboardAnalysisPeriodOptions() {
+    var endMonth = appState.ui.dashboardAnalysis.periodEnd || currentPeriodMonth();
+    var parts = endMonth.split('-');
+    var endYear = Number(parts[0]) || 2026;
+    var endMo = Number(parts[1]) || 4;
+    var months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+    var options = '';
+    for (var i = 0; i < 12; i++) {
+      var y = endYear;
+      var m = endMo - i;
+      while (m <= 0) { m += 12; y -= 1; }
+      var val = y + '-' + (m < 10 ? '0' + m : m);
+      var label = y + '年' + months[m - 1];
+      var selected = val === endMonth ? ' selected' : '';
+      options += '<option value="' + val + '"' + selected + '>' + label + '</option>';
+    }
+    return options;
+  }
+
+  function dashboardAnalysisChartOption() {
+    var endMonth = appState.ui.dashboardAnalysis.periodEnd || currentPeriodMonth();
+    var parts = endMonth.split('-');
+    var endYear = Number(parts[0]) || 2026;
+    var endMo = Number(parts[1]) || 4;
+    var labels = [];
+    var months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+    for (var i = 5; i >= 0; i--) {
+      var y = endYear;
+      var m = endMo - i;
+      while (m <= 0) { m += 12; y -= 1; }
+      labels.push(months[m - 1]);
+    }
+    var baseAmounts = [[860,1420,1180,2260,1950,2480],[520,860,980,1320,1540,1790],[460,790,910,1280,1490,1680],[680,1180,1260,1890,1720,2160]];
+    var baseCount = [8,12,11,17,15,19];
+    var hash = endMonth.charCodeAt(0) * 7 + endMonth.charCodeAt(3) * 13 + endMo;
+    var offset = hash % 6;
+    function shift(arr) { return arr.map(function(v,i) { return v + (i+offset)*20 - 50; }); }
+    return {
+      title: { text: '' },
+      tooltip: { trigger: 'axis' },
+      legend: { top: 'top', right: 16 },
+      xAxis: { type: 'category', data: labels },
+      yAxis: [
+        { type: 'value', name: '金额（万元）', position: 'left' },
+        { type: 'value', name: '数量（份）', position: 'right' }
+      ],
+      series: [
+        { type: 'line', name: '合同金额', color: '#28d7ff', lineWidth: 4, lineGlow: 0.18, yAxisIndex: 0, data: shift(baseAmounts[0]) },
+        { type: 'line', name: '回款金额', color: '#25d18a', lineWidth: 4, lineGlow: 0.18, yAxisIndex: 0, data: shift(baseAmounts[1]) },
+        { type: 'line', name: '开票金额', color: '#ffb347', lineWidth: 4, lineGlow: 0.18, yAxisIndex: 0, data: shift(baseAmounts[2]) },
+        { type: 'line', name: '生产产值', color: '#8b7cff', lineWidth: 4, lineGlow: 0.18, yAxisIndex: 0, data: shift(baseAmounts[3]) },
+        { type: 'line', name: '合同签订数量', color: '#ffd166', lineWidth: 4, lineGlow: 0.18, yAxisIndex: 1, data: baseCount.map(function(v) { return v + (hash % 3) - 1; }) }
+      ]
+    };
+  }
+
   function pcDashboardHTML() {
     return [
-      '<div class="hero-banner">',
-      '<div><div class="eyebrow">国企数字化 · 消防工程 · 项目经营驾驶舱</div><h2>' + data.meta.organization + '</h2><p>' + data.meta.slogan + '</p><div class="hero-actions"><button class="btn primary" data-route="/pc/project/archive">查看项目全景</button><button class="btn secondary" data-route="/pc/finance/profit">查看经营分析</button></div></div>',
-      '<div class="hero-side"><div class="metric-ring"><span>经营健康度</span><strong>92</strong></div><div class="hero-kpi"><label>今日待办</label><b>27 项</b><span>含超期工单、告警、回款、审批</span></div></div>',
-      '</div>',
-      statCardsHTML(),
+      dashboardHeroHTML(),
       '<div class="content-grid dashboard-grid-2">',
-      chartPanel('chart-customer-scale', '客户规模分析', '按客户类型查看已签约、重点跟进、储备商机结构'),
-      chartPanel('chart-customer-channel', '来源渠道分析', '分析集团转介、招投标、续签、转介绍等来源构成'),
+      contractAnalysisPanel({
+        title: '合同统计',
+        chartId: 'chart-contract-trend',
+        sideTitle: '月度汇总',
+        cards: [
+          { label: '本月新签合同数量', value: '19 份' },
+          { label: '本月回款总额', value: '¥368.5 万' }
+        ]
+      }),
+      '<div class="panel chart-panel"><div class="panel-header"><div style="display:flex;align-items:center;justify-content:space-between;width:100%"><h3>经营分析</h3><label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#8aa0c5"><span>时间范围</span><select data-dashboard-analysis-period style="background:rgba(22,48,88,.5);color:#dbeafe;border:1px solid rgba(120,196,255,.25);border-radius:6px;padding:3px 8px;font-size:12px">' + dashboardAnalysisPeriodOptions() + '</select></label></div></div><div class="chart" id="chart-invoice-trend"></div></div>',
+      '</div>',
+      '<div class="content-grid dashboard-grid-2">',
+      richDashboardChartPanel({
+        id: 'chart-customer-scale',
+        title: '客户规模分析',
+        sub: ''
+      }),
+      richDashboardChartPanel({
+        id: 'chart-customer-channel',
+        title: '来源渠道分析',
+        sub: ''
+      }),
       '</div>',
       '<div class="content-grid dashboard-grid-3">',
-      chartPanel('chart-project-status', '项目状态分析', '识别在建、方案、验收、运维等项目状态'),
-      alertListHTML('超期工勘工单', '优先关注现场勘查超期事项', data.dashboard.overdueSurveyOrders),
-      alertListHTML('超期施工工单', '重点展示施工执行与整改超期事项', data.dashboard.overdueConstructionOrders),
+      stackedChartPanel({
+        title: '项目状态分析',
+        sub: '',
+        topId: 'chart-project-status',
+        bottomId: 'chart-project-trend-30d',
+        bottomTitle: '近30日立项趋势'
+      }),
+      alertListHTML('超期工勘工单', '', data.dashboard.overdueSurveyOrders),
+      alertListHTML('超期施工工单', '', data.dashboard.overdueConstructionOrders),
       '</div>',
       '<div class="content-grid dashboard-grid-2">',
-      chartPanel('chart-device-status', '设备使用/空闲状态分析', '掌握在线、空闲、维修、待报废状态'),
-      chartPanel('chart-device-category', '设备分类统计', '面向消防主机、喷淋、广播、电源监控等设备分类'),
+      dualPieChartPanel({
+        title: '设备状态分析',
+        leftTitle: '业务状态',
+        rightTitle: '在线/离线占比',
+        leftId: 'chart-device-status',
+        rightId: 'chart-device-online-offline'
+      }),
+      chartPanel('chart-device-category', '设备分类统计', ''),
       '</div>',
-      '<div class="content-grid dashboard-grid-2">',
-      chartPanel('chart-contract-trend', '合同签订趋势', '观察月度合同签订金额变化'),
-      chartPanel('chart-invoice-trend', '开票金额趋势', '联动经营开票与回款节奏分析'),
-      '</div>',
-      '<div class="content-grid dashboard-grid-2">',
-      timelineHTML(data.timelines.dashboard, '今日动态', '经营活动、工单流转、财务动作一屏呈现'),
-      noticeHTML()
-      ,
       '</div>'
     ].join('');
   }
@@ -7719,14 +7949,22 @@
   }
 
   function appHomeHTML() {
+    var taskReminder = data.appHomeTaskReminder || {};
+    var taskReminderItems = taskReminder.items || [];
+    var taskReminderTotal = Number(taskReminder.total);
+    if (!Number.isFinite(taskReminderTotal)) {
+      taskReminderTotal = taskReminderItems.reduce(function (sum, item) { return sum + (Number(item.value) || 0); }, 0);
+    }
     return [
       '<div class="mobile-home-hero">',
       '<div class="mobile-quick-actions">' + (data.appHomeQuickActions || []).map(function (item) {
         return '<button class="mobile-quick-item" data-route="' + item.route + '"><span class="mobile-quick-icon">' + item.icon + '</span><label>' + item.label + '</label></button>';
       }).join('') + '</div></div>',
-      '<section class="mobile-section mobile-task-section"><div class="section-title"><h4>任务提醒</h4><span></span></div><div class="mobile-task-grid mobile-task-grid-2">' + (data.appHomeTasks || []).map(function (item) {
-        return '<button class="mobile-task-card" data-route="' + item.route + '"><span>' + item.label + '</span><strong>' + item.value + '</strong></button>';
-      }).join('') + '</div></section>',
+      '<section class="mobile-task-section"><div class="mobile-task-reminder">' +
+        '<button class="mobile-task-reminder-head" data-route="' + escapeHtml(taskReminder.route || '/app/survey-workorder') + '"><span>' + escapeHtml(taskReminder.label || '待办工单') + '</span><strong>' + taskReminderTotal + '</strong></button>' +
+        '<div class="mobile-task-reminder-grid">' + (taskReminderItems.map(function (item) {
+          return '<button class="mobile-task-reminder-item" data-route="' + escapeHtml(item.route || '/app/home') + '"><span>' + escapeHtml(item.label || '-') + '</span><strong>' + (Number(item.value) || 0) + '</strong></button>';
+        }).join('') || '<div class="empty-state">暂无任务</div>') + '</div></div></section>',
       data.appHomeGroups.map(function (group) {
         return '<section class="mobile-section"><div class="section-title"><h4>' + group.title + '</h4></div><div class="app-grid">' + group.items.map(function (item) {
           return '<button class="app-grid-item app-grid-item-entry" data-route="' + item.route + '"><i class="app-entry-icon">' + (item.icon || '◌') + '</i><span>' + item.label + '</span></button>';
@@ -7772,7 +8010,7 @@
       items.push({
         id: item.id,
         type: 'cost',
-        typeLabel: '造价单',
+        typeLabel: '报价单',
         title: item.id,
         subtitle: item.projectName || '-',
         status: item.status || '审批中',
@@ -7858,7 +8096,7 @@
       items.push({
         id: item.id,
         type: 'cost',
-        typeLabel: '造价单',
+        typeLabel: '报价单',
         title: item.id,
         subtitle: item.projectName || '-',
         status: item.status || '-',
@@ -7921,16 +8159,14 @@
   }
 
   function appApprovalCardHTML(item) {
-    var actionClass = item.routeType === 'pc' ? 'secondary' : 'primary';
-    return '<div class="mobile-cost-card app-approval-card">' +
-      '<div class="mobile-cost-card-head"><strong>' + escapeHtml(item.title || '-') + '</strong><span class="status ' + badgeClass(item.status || '') + '">' + escapeHtml(item.status || '-') + '</span></div>' +
+    var submitInfo = (escapeHtml(item.owner || '-') + ' · ' + escapeHtml(item.time || '-'));
+    return '<button class="mobile-cost-card app-approval-card" data-action="app-approval-open" data-type="' + escapeHtml(item.type) + '" data-id="' + escapeHtml(item.id) + '">' +
+      '<div class="mobile-cost-card-head"><strong>' + escapeHtml(item.title || '-') + '</strong></div>' +
       '<div class="mobile-cost-card-body">' +
       '<div class="mobile-cost-card-row"><span>单据类型</span><strong>' + escapeHtml(item.typeLabel || '-') + '</strong></div>' +
-      '<div class="mobile-cost-card-row"><span>关联信息</span><strong>' + escapeHtml(item.subtitle || '-') + '</strong></div>' +
-      '<div class="mobile-cost-card-row"><span>提交人</span><strong>' + escapeHtml(item.owner || '-') + '</strong></div>' +
-      '<div class="mobile-cost-card-row"><span>提交时间</span><strong>' + escapeHtml(item.time || '-') + '</strong></div>' +
-      '<div class="mobile-cost-card-row"><span>数量/金额</span><strong>' + escapeHtml(item.amount || '-') + '</strong></div>' +
-      '</div><div class="mobile-cost-actions"><button class="btn ' + actionClass + '" data-action="app-approval-open" data-type="' + escapeHtml(item.type) + '" data-id="' + escapeHtml(item.id) + '">' + escapeHtml(item.actionText || '查看') + '</button></div></div>';
+      '<div class="mobile-cost-card-row app-approval-row-info"><span>关联信息</span><strong class="app-approval-ellipsis-2">' + escapeHtml(item.subtitle || '-') + '</strong></div>' +
+      '<div class="mobile-cost-card-row"><span>提交信息</span><strong>' + submitInfo + '</strong></div>' +
+      '</div></button>';
   }
 
   function openAppApprovalItem(type, id) {
@@ -7947,7 +8183,7 @@
   function appApprovalHTML() {
     var view = appState.ui.appApprovalView || 'pending';
     var rows = view === 'submitted' ? getAppSubmittedApprovalItems() : getAppPendingApprovalItems();
-    return '<section class="mobile-section"><div class="section-title"><h4>' + (view === 'submitted' ? '已提交' : '待审批') + '</h4><button class="btn secondary btn-sm" data-action="app-approval-switch" data-view="' + (view === 'submitted' ? 'pending' : 'submitted') + '">' + (view === 'submitted' ? '待审批' : '已提交') + '</button></div><div class="mobile-cost-list">' + ((rows.map(function (item) {
+    return '<section class="mobile-section app-approval-section"><div class="section-title"><h4>' + (view === 'submitted' ? '已提交' : '待审批') + '</h4><button class="btn secondary btn-sm" data-action="app-approval-switch" data-view="' + (view === 'submitted' ? 'pending' : 'submitted') + '">' + (view === 'submitted' ? '待审批' : '已提交') + '</button></div><div class="mobile-cost-list">' + ((rows.map(function (item) {
       return appApprovalCardHTML(item);
     }).join('')) || '<div class="empty-state">' + (view === 'submitted' ? '暂无我提交的审批单据' : '暂无待处理审批') + '</div>') + '</div></section>';
   }
@@ -8020,7 +8256,7 @@
       : route === '/app/project-cost/detail' && costDetailItem && costDetailMode === 'view'
         ? '<div class="mobile-topbar-actions"><button class="btn secondary mobile-topbar-action-icon mobile-icon-btn" data-action="app-cost-more-toggle" aria-label="更多">⋯</button>' + (appState.ui.appCostMoreOpen ? '<div class="mobile-topbar-more-menu"><button class="mobile-topbar-more-item" data-action="app-cost-edit" data-id="' + escapeHtml(costDetailItem.id) + '">编辑</button><button class="mobile-topbar-more-item" data-action="app-cost-approve" data-id="' + escapeHtml(costDetailItem.id) + '">审批</button><button class="mobile-topbar-more-item danger" data-action="app-cost-revoke" data-id="' + escapeHtml(costDetailItem.id) + '">撤回</button></div>' : '') + '</div>'
       : route === '/app/purchase-order'
-        ? '<button class="btn primary mobile-topbar-action mobile-icon-btn" data-action="app-purchase-create" aria-label="新增">＋</button>'
+        ? '<button class="btn primary mobile-topbar-action mobile-icon-btn" data-action="app-purchase-create" data-route="/app/purchase-order/detail" aria-label="新增">＋</button>'
         : route === '/app/purchase-order/detail' && purchaseDetailItem && purchaseDetailMode === 'view'
           ? '<div class="mobile-topbar-actions"><button class="btn secondary mobile-topbar-action-icon mobile-icon-btn" data-action="app-purchase-more-toggle" aria-label="更多">⋯</button>' + (appState.ui.appPurchaseMoreOpen ? '<div class="mobile-topbar-more-menu">' + (safeText(purchaseDetailItem.status) === '待审核' ? '<button class="mobile-topbar-more-item" data-action="app-purchase-approve" data-id="' + escapeHtml(purchaseDetailItem.id) + '">审核</button>' : '') + (safeText(purchaseDetailItem.inboundStatus) === '待入库' ? '<button class="mobile-topbar-more-item" data-action="app-purchase-inbound" data-id="' + escapeHtml(purchaseDetailItem.id) + '">入库</button>' : '') + '<button class="mobile-topbar-more-item" data-action="app-purchase-edit" data-id="' + escapeHtml(purchaseDetailItem.id) + '">编辑</button><button class="mobile-topbar-more-item danger" data-action="app-purchase-delete" data-id="' + escapeHtml(purchaseDetailItem.id) + '">删除</button></div>' : '') + '</div>'
       : route === '/app/device-receive'
@@ -8044,9 +8280,10 @@
               : route === '/app/maintenance-workorder/detail' && maintenanceDetailItem && maintenanceDetailMode === 'view'
                 ? '<div class="mobile-topbar-actions"><button class="btn secondary mobile-topbar-action-icon mobile-icon-btn" data-action="app-maintenance-more-toggle" aria-label="更多">⋯</button>' + (appState.ui.appMaintenanceMoreOpen ? '<div class="mobile-topbar-more-menu"><button class="mobile-topbar-more-item" data-action="app-maintenance-edit" data-id="' + escapeHtml(maintenanceDetailItem.id) + '">编辑</button><button class="mobile-topbar-more-item" data-action="app-maintenance-revoke" data-id="' + escapeHtml(maintenanceDetailItem.id) + '">撤回</button><button class="mobile-topbar-more-item danger" data-action="app-maintenance-delete" data-id="' + escapeHtml(maintenanceDetailItem.id) + '">删除</button></div>' : '') + '</div>'
             : '';
+    var showBackBtn = !{ '/app/home': 1, '/app/message': 1, '/app/approval': 1, '/app/profile': 1 }[route];
     return [
       '<div class="screen screen-app-shell"><button class="app-floating-pc" data-route="/pc/dashboard">切换至PC端</button><div class="device-frame"><div class="device-notch"></div><div class="screen-app">',
-      '<header class="mobile-topbar">' + (route === '/app/home' ? '' : '<button class="mobile-back-btn" data-route="' + appBackRoute + '" aria-label="返回">‹</button>') + '<div><h2>' + (route === '/app/home' ? '城投项目管理系统' : routeMeta[route].title) + '</h2></div>' + topbarAction + (((route === '/app/project-cost/detail' && appState.ui.appCostMoreOpen) || (route === '/app/purchase-order/detail' && appState.ui.appPurchaseMoreOpen) || (route === '/app/device-receive/detail' && appState.ui.appDeviceReceiveMoreOpen) || (route === '/app/device-return/detail' && appState.ui.appDeviceReturnMoreOpen) || (route === '/app/survey-workorder/detail' && appState.ui.appSurveyMoreOpen) || (route === '/app/construction-workorder/detail' && appState.ui.appConstructionMoreOpen) || (route === '/app/maintenance-workorder/detail' && appState.ui.appMaintenanceMoreOpen)) ? '<button class="mobile-topbar-more-mask" data-action="' + (route === '/app/project-cost/detail' ? 'app-cost-more-toggle' : route === '/app/purchase-order/detail' ? 'app-purchase-more-toggle' : route === '/app/device-receive/detail' ? 'app-device-receive-more-toggle' : route === '/app/device-return/detail' ? 'app-device-return-more-toggle' : route === '/app/survey-workorder/detail' ? 'app-survey-more-toggle' : route === '/app/construction-workorder/detail' ? 'app-construction-more-toggle' : 'app-maintenance-more-toggle') + '" aria-label="关闭更多"></button>' : '') + '</header>',
+      '<header class="mobile-topbar">' + (showBackBtn ? '<button class="mobile-back-btn" data-route="' + appBackRoute + '" aria-label="返回">‹</button>' : '') + '<div><h2>' + (route === '/app/home' ? '城投项目管理系统' : routeMeta[route].title) + '</h2></div>' + topbarAction + (((route === '/app/project-cost/detail' && appState.ui.appCostMoreOpen) || (route === '/app/purchase-order/detail' && appState.ui.appPurchaseMoreOpen) || (route === '/app/device-receive/detail' && appState.ui.appDeviceReceiveMoreOpen) || (route === '/app/device-return/detail' && appState.ui.appDeviceReturnMoreOpen) || (route === '/app/survey-workorder/detail' && appState.ui.appSurveyMoreOpen) || (route === '/app/construction-workorder/detail' && appState.ui.appConstructionMoreOpen) || (route === '/app/maintenance-workorder/detail' && appState.ui.appMaintenanceMoreOpen)) ? '<button class="mobile-topbar-more-mask" data-action="' + (route === '/app/project-cost/detail' ? 'app-cost-more-toggle' : route === '/app/purchase-order/detail' ? 'app-purchase-more-toggle' : route === '/app/device-receive/detail' ? 'app-device-receive-more-toggle' : route === '/app/device-return/detail' ? 'app-device-return-more-toggle' : route === '/app/survey-workorder/detail' ? 'app-survey-more-toggle' : route === '/app/construction-workorder/detail' ? 'app-construction-more-toggle' : 'app-maintenance-more-toggle') + '" aria-label="关闭更多"></button>' : '') + '</header>',
       '<main class="mobile-body">' + body + '</main>',
       (showBottomNav ? '<footer class="bottom-nav">' + data.appTabs.map(function (tab) {
         return '<button class="bottom-item ' + (tab.route === route ? 'current' : '') + '" data-route="' + tab.route + '"><span>' + tab.icon + '</span><label>' + tab.label + '</label></button>';
@@ -8060,10 +8297,12 @@
       echarts.init(document.getElementById('chart-customer-scale')).setOption(data.dashboard.customerScaleChart);
       echarts.init(document.getElementById('chart-customer-channel')).setOption(data.dashboard.customerChannelChart);
       echarts.init(document.getElementById('chart-project-status')).setOption(data.dashboard.projectStatusChart);
+      echarts.init(document.getElementById('chart-project-trend-30d')).setOption(data.dashboard.projectApprovalTrend30dChart);
       echarts.init(document.getElementById('chart-device-status')).setOption(data.dashboard.deviceStatusChart);
+      echarts.init(document.getElementById('chart-device-online-offline')).setOption(data.dashboard.deviceOnlineOfflineChart);
       echarts.init(document.getElementById('chart-device-category')).setOption(data.dashboard.deviceCategoryChart);
       echarts.init(document.getElementById('chart-contract-trend')).setOption(data.dashboard.contractTrendChart);
-      echarts.init(document.getElementById('chart-invoice-trend')).setOption(data.dashboard.invoiceTrendChart);
+      echarts.init(document.getElementById('chart-invoice-trend')).setOption(dashboardAnalysisChartOption());
       return;
     }
     if (route === '/pc/finance/performance') {
@@ -8125,8 +8364,18 @@
   }
 
   function bindActions() {
+    root.querySelectorAll('[data-dashboard-analysis-period]').forEach(function (node) {
+      node.addEventListener('change', function () {
+        appState.ui.dashboardAnalysis.periodEnd = node.value;
+        var chartDom = document.getElementById('chart-invoice-trend');
+        if (chartDom) echarts.init(chartDom).setOption(dashboardAnalysisChartOption());
+      });
+    });
     root.querySelectorAll('[data-route]').forEach(function (node) {
       node.addEventListener('click', function () {
+        var action = node.getAttribute('data-action');
+        if (action === 'app-purchase-create') return openAppPurchaseDetail('create');
+        if (action === 'app-purchase-view') return openAppPurchaseDetail('view', node.getAttribute('data-id'));
         setRoute(node.getAttribute('data-route'));
       });
     });
@@ -8873,7 +9122,7 @@
         if (action === 'vehicle-edit') return openVehicleModal('edit', id);
         if (action === 'vehicle-delete') return deleteVehicle(id);
         if (action === 'vehicle-reset') {
-          getVehicleLogState().filters = { plate: '', user: '', status: '' };
+          getVehicleLogState().filters = { plate: '', user: '' };
           return render();
         }
         if (action === 'vehicle-search') return render();
@@ -9677,7 +9926,7 @@
 
   function buildDefaultCostDetails() {
     return (data.projectCostOptions.costItems || []).map(function (item) {
-      return { name: item.name, unit: item.unit, qty: '', price: '', amount: '', remark: '' };
+      return { name: item.name, brand: '', model: '', brandModel: '', unit: item.unit, qty: '', price: '', amount: '', remark: '' };
     });
   }
 
@@ -9712,6 +9961,9 @@
       var amount = (Number(qty) || 0) * (Number(price) || 0);
       return {
         name: item.name,
+        brand: safeText(formData.get('detail-brand-' + index)).trim(),
+        model: safeText(formData.get('detail-model-' + index)).trim(),
+        brandModel: [safeText(formData.get('detail-brand-' + index)).trim(), safeText(formData.get('detail-model-' + index)).trim()].join(' ').trim(),
         unit: item.unit,
         qty: qty,
         price: price,
@@ -9728,8 +9980,8 @@
       createTime: '2026-04-09 14:20',
       status: modal.item.status || '草稿',
       approvalRecords: modal.mode === 'edit'
-        ? originalRecords.concat([{ time: '2026-04-09 14:20', operator: currentUserName(), action: '编辑', remark: '更新造价明细。' }])
-        : [{ time: '2026-04-09 14:20', operator: currentUserName(), action: '创建', remark: '新建造价单，待提交审批。' }],
+        ? originalRecords.concat([{ time: '2026-04-09 14:20', operator: currentUserName(), action: '编辑', remark: '更新报价明细。' }])
+        : [{ time: '2026-04-09 14:20', operator: currentUserName(), action: '创建', remark: '新建报价单，待提交审批。' }],
       details: details
     };
     if (modal.mode === 'edit' && modal.item.id) {
@@ -9780,12 +10032,12 @@
   }
 
   function revokeCost(id) {
-    if (!window.confirm('确认撤销该造价单吗？撤销后状态将变为已撤销。')) return;
+    if (!window.confirm('确认撤销该报价单吗？撤销后状态将变为已撤销。')) return;
     var state = getProjectCostState();
     state.list = state.list.map(function (item) {
       return item.id === id ? Object.assign({}, item, {
         status: '已撤销',
-        approvalRecords: (item.approvalRecords || []).concat([{ time: '2026-04-09 16:00', operator: currentUserName(), action: '撤回', remark: '撤回造价单。' }])
+        approvalRecords: (item.approvalRecords || []).concat([{ time: '2026-04-09 16:00', operator: currentUserName(), action: '撤回', remark: '撤回报价单。' }])
       }) : item;
     });
     render();
@@ -9804,7 +10056,7 @@
       creator: currentUserName(),
       createTime: '2026-04-14 16:30',
       status: '草稿',
-      approvalRecords: [{ time: '2026-04-14 16:30', operator: currentUserName(), action: '创建', remark: 'APP端新增造价单草稿。' }],
+      approvalRecords: [{ time: '2026-04-14 16:30', operator: currentUserName(), action: '创建', remark: 'APP端新增报价单草稿。' }],
       details: (data.projectCostOptions.costItems || []).map(function (item) {
         return { name: item.name, unit: item.unit, qty: '', price: '', amount: '', remark: '' };
       })
@@ -9951,7 +10203,7 @@
       '<section class="mobile-section">',
       '<div class="mobile-cost-toolbar app-purchase-toolbar"><label class="field mobile-cost-toolbar-keyword"><input data-app-purchase-filter="keyword" value="' + escapeHtml(filters.keyword || '') + '" placeholder="单号/供应商/创建人" /></label><label class="field mobile-cost-toolbar-status"><select data-app-purchase-filter="status">' + optionHTML(data.purchaseOrderOptions.statuses, filters.status || '', '审核状态') + '</select></label><label class="field mobile-cost-toolbar-status"><select data-app-purchase-filter="inboundStatus">' + optionHTML(data.purchaseOrderOptions.inboundStatuses, filters.inboundStatus || '', '入库状态') + '</select></label><div class="mobile-cost-toolbar-actions"><button class="btn secondary mobile-icon-btn" data-action="app-purchase-search" aria-label="检索">⌕</button></div></div>',
       '<div class="mobile-cost-list">' + (rows.map(function (item) {
-        return '<button class="mobile-cost-card" data-action="app-purchase-view" data-id="' + escapeHtml(item.id) + '"><div class="mobile-cost-card-head app-purchase-card-head"><strong>' + escapeHtml(item.id) + '</strong><div class="app-purchase-card-badges"><span class="status ' + appPurchaseStatusClass(item) + '">' + escapeHtml(item.status || '-') + '</span><span class="status ' + badgeClass(item.inboundStatus || '') + '">' + escapeHtml(item.inboundStatus || '-') + '</span></div></div><div class="mobile-cost-card-body"><div class="mobile-cost-card-row"><span>供应商</span><strong>' + escapeHtml(item.supplierName || '-') + '</strong></div><div class="mobile-cost-card-row"><span>金额</span><strong>' + escapeHtml(item.amount || '-') + '</strong></div><div class="mobile-cost-card-row"><span>创建人</span><strong>' + escapeHtml(item.creator || '-') + '</strong></div><div class="mobile-cost-card-row"><span>时间</span><strong>' + escapeHtml(item.createTime || '-') + '</strong></div></div></button>';
+        return '<button class="mobile-cost-card" data-action="app-purchase-view" data-route="/app/purchase-order/detail" data-id="' + escapeHtml(item.id) + '"><div class="mobile-cost-card-head app-purchase-card-head"><strong>' + escapeHtml(item.id) + '</strong><div class="app-purchase-card-badges"><span class="status ' + appPurchaseStatusClass(item) + '">' + escapeHtml(item.status || '-') + '</span><span class="status ' + badgeClass(item.inboundStatus || '') + '">' + escapeHtml(item.inboundStatus || '-') + '</span></div></div><div class="mobile-cost-card-body"><div class="mobile-cost-card-row"><span>供应商</span><strong>' + escapeHtml(item.supplierName || '-') + '</strong></div><div class="mobile-cost-card-row"><span>金额</span><strong>' + escapeHtml(item.amount || '-') + '</strong></div><div class="mobile-cost-card-row"><span>创建人</span><strong>' + escapeHtml(item.creator || '-') + '</strong></div><div class="mobile-cost-card-row"><span>时间</span><strong>' + escapeHtml(item.createTime || '-') + '</strong></div></div></button>';
       }).join('') || '<div class="empty-state">暂无采购单</div>') + '</div></section>'
     ].join('');
   }
@@ -11174,14 +11426,18 @@
       '<div class="mobile-cost-toolbar mobile-cost-toolbar-inline"><label class="field mobile-cost-toolbar-keyword"><input data-app-cost-filter="keyword" value="' + escapeHtml(filters.keyword || '') + '" placeholder="请输入" /></label><label class="field mobile-cost-toolbar-status"><select data-app-cost-filter="status">' + optionHTML(['待审批', '已审批'], filters.status || '', '全部状态') + '</select></label><div class="mobile-cost-toolbar-actions"><button class="btn secondary mobile-icon-btn" data-action="app-cost-search" aria-label="检索">⌕</button></div></div>',
       '<div class="mobile-cost-list">' + ((rows.map(function (item) {
         return '<button class="mobile-cost-card" data-action="app-cost-view" data-id="' + item.id + '"><div class="mobile-cost-card-head"><strong>' + escapeHtml(item.id) + '</strong><span class="status ' + (appCostMobileStatusText(item.status) === '已审批' ? 'success' : 'warning') + '">' + escapeHtml(appCostMobileStatusText(item.status)) + '</span></div><div class="mobile-cost-card-body"><div class="mobile-cost-card-row"><span>项目名称</span><strong>' + escapeHtml(item.projectName) + '</strong></div><div class="mobile-cost-card-row"><span>创建人</span><strong>' + escapeHtml(item.creator) + '</strong></div><div class="mobile-cost-card-row"><span>创建时间</span><strong>' + escapeHtml(item.createTime) + '</strong></div></div></button>';
-      }).join('')) || '<div class="empty-state">暂无造价单</div>') + '</div></section>'
+      }).join('')) || '<div class="empty-state">暂无报价单</div>') + '</div></section>'
     ].join('');
   }
 
   function appCostDetailRowHTML(item, index, editable) {
+    var fallbackBrandModel = costDetailBrandModelByName(item.name);
+    var brandText = item.brand || ((item.brandModel || '').split(' ')[0] || '') || fallbackBrandModel.brand;
+    var modelText = item.model || ((item.brandModel || '').split(' ').slice(1).join(' ') || '') || fallbackBrandModel.model;
     return '<div class="mobile-cost-detail-row">' +
       '<div class="mobile-cost-detail-row-head"><strong>' + escapeHtml(item.name) + '</strong></div>' +
       '<div class="mobile-cost-detail-grid">' +
+      '<div class="mobile-cost-detail-stats"><div class="mobile-cost-detail-stat"><span>品牌</span>' + (editable ? '<select data-app-cost-detail="brand" data-index="' + index + '">' + costBrandOptionsHTML(brandText) + '</select>' : '<input disabled value="' + escapeHtml(brandText || '-') + '" />') + '</div><div class="mobile-cost-detail-stat"><span>型号</span>' + (editable ? '<select data-app-cost-detail="model" data-index="' + index + '">' + costModelOptionsHTML(modelText) + '</select>' : '<input disabled value="' + escapeHtml(modelText || '-') + '" />') + '</div></div>' +
       '<div class="mobile-cost-detail-stats"><div class="mobile-cost-detail-stat"><span>数量</span>' + (editable ? '<input data-app-cost-detail="qty" data-index="' + index + '" value="' + escapeHtml(item.qty) + '" />' : '<input disabled value="' + escapeHtml(item.qty || '-') + '" />') + '</div><div class="mobile-cost-detail-stat"><span>单价</span>' + (editable ? '<input data-app-cost-detail="price" data-index="' + index + '" value="' + escapeHtml(item.price) + '" />' : '<input disabled value="' + escapeHtml(item.price || '-') + '" />') + '</div><div class="mobile-cost-detail-stat"><span>合价</span><input disabled value="' + escapeHtml(String(item.amount || '-')) + '" data-app-cost-amount="' + index + '" /></div></div>' +
       '<label class="field mobile-cost-detail-inline-field mobile-cost-detail-row-full mobile-cost-detail-remark"><span>备注</span>' + (editable ? '<textarea data-app-cost-detail="remark" data-index="' + index + '" placeholder="请输入备注">' + escapeHtml(item.remark || '') + '</textarea>' : '<textarea disabled>' + escapeHtml(item.remark || '-') + '</textarea>') + '</label>' +
       '</div></div>';
@@ -11189,7 +11445,7 @@
 
   function appProjectCostDetailHTML() {
     var item = currentAppCostDetailItem();
-    if (!item) return '<section class="mobile-section"><div class="empty-state">未找到对应造价单</div></section>';
+    if (!item) return '<section class="mobile-section"><div class="empty-state">未找到对应报价单</div></section>';
     var mode = appState.ui.currentAppCostDetailMode || 'view';
     var editable = mode === 'edit' || mode === 'create';
     var approvable = mode === 'approve';
@@ -11207,7 +11463,7 @@
       return '<label class="field mobile-cost-detail-inline-field mobile-cost-detail-row-full"><span>' + escapeHtml(label) + '</span>' + controlHTML + '</label>';
     }
     return [
-      '<section class="mobile-section"><div class="section-title"><h4>' + (mode === 'create' ? '新增造价单' : '造价详情') + '</h4><span>' + escapeHtml(item.id || '待生成') + '</span></div>',
+      '<section class="mobile-section"><div class="section-title"><h4>' + (mode === 'create' ? '新增报价单' : '报价详情') + '</h4><span>' + escapeHtml(item.id || '待生成') + '</span></div>',
       '<div class="mobile-cost-detail-card">' +
       appCostInlineField('项目', editable ? '<select data-app-cost-base="projectId">' + mappedOptionHTML(getAllProjectItems(getProjectArchiveState().tree).map(function (project) { return { value: project.id, label: project.name }; }), item.projectId || '', '请选择项目') + '</select>' : '<input disabled value="' + escapeHtml(item.projectName || '-') + '" />') +
       appCostInlineField('客户名称', '<input disabled value="' + escapeHtml(item.customerName || '-') + '" data-app-cost-base-display="customerName" />') +
@@ -11231,6 +11487,9 @@
     var item = currentAppCostDetailItem();
     if (!item || !item.details || !item.details[index]) return;
     item.details[index][field] = value;
+    if (field === 'brand' || field === 'model') {
+      item.details[index].brandModel = [item.details[index].brand || '', item.details[index].model || ''].join(' ').trim();
+    }
     var qty = Number(item.details[index].qty) || 0;
     var price = Number(item.details[index].price) || 0;
     item.details[index].amount = qty * price;
@@ -11263,7 +11522,7 @@
       item.id = 'ZJ-2026-' + String(getProjectCostState().nextId).padStart(3, '0');
       item.createTime = now;
       item.status = '审批中';
-      item.approvalRecords = (item.approvalRecords || []).concat([{ time: now, operator: currentUserName(), action: '提交', remark: 'APP端提交新增造价单。' }]);
+      item.approvalRecords = (item.approvalRecords || []).concat([{ time: now, operator: currentUserName(), action: '提交', remark: 'APP端提交新增报价单。' }]);
       getProjectCostState().list.unshift(item);
       getProjectCostState().nextId += 1;
     } else {
@@ -11271,8 +11530,8 @@
         return row.id === id ? Object.assign({}, row, item, {
           status: '审批中',
           approvalRecords: (row.approvalRecords || [])
-            .concat([{ time: now, operator: currentUserName(), action: '编辑', remark: 'APP端更新造价明细。' }])
-            .concat([{ time: now, operator: currentUserName(), action: '提交', remark: 'APP端提交造价单编辑。' }])
+            .concat([{ time: now, operator: currentUserName(), action: '编辑', remark: 'APP端更新报价明细。' }])
+            .concat([{ time: now, operator: currentUserName(), action: '提交', remark: 'APP端提交报价单编辑。' }])
         }) : row;
       });
     }
@@ -11295,7 +11554,7 @@
 
   function revokeAppCost(id) {
     getProjectCostState().list = getProjectCostState().list.map(function (row) {
-      return row.id === id ? Object.assign({}, row, { status: '已撤销', approvalRecords: (row.approvalRecords || []).concat([{ time: '2026-04-14 17:10', operator: currentUserName(), action: '撤回', remark: 'APP端撤回造价单。' }]) }) : row;
+      return row.id === id ? Object.assign({}, row, { status: '已撤销', approvalRecords: (row.approvalRecords || []).concat([{ time: '2026-04-14 17:10', operator: currentUserName(), action: '撤回', remark: 'APP端撤回报价单。' }]) }) : row;
     });
     openAppCostDetail('view', id);
   }
@@ -11970,7 +12229,7 @@
 
   function openEngineerTeamModal(mode, id) {
     var item = id ? JSON.parse(JSON.stringify(findEngineerTeam(id))) : {
-      name: '', ownerId: '', ownerName: '', status: '启用', desc: '', createTime: '', memberIds: []
+      name: '', ownerId: '', ownerName: '', status: '启用', laborCost: '', surveyLaborCost: '', desc: '', createTime: '', memberIds: []
     };
     getEngineerTeamState().modal = { mode: mode, item: item };
     render();
@@ -11992,6 +12251,8 @@
       ownerId: ownerId,
       ownerName: owner ? owner.name : '',
       status: safeText(formData.get('status')).trim() || '启用',
+      laborCost: safeText(formData.get('laborCost')).trim(),
+      surveyLaborCost: safeText(formData.get('surveyLaborCost')).trim(),
       desc: safeText(formData.get('desc')).trim(),
       createTime: modal.item.createTime || '2026-04-09 19:20',
       memberIds: modal.item.memberIds || []

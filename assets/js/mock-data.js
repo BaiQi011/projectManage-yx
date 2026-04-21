@@ -1,4 +1,4 @@
-﻿window.DEMO_DATA = {
+window.DEMO_DATA = {
   meta: {
   systemName: '项目管理系统（演示版）',
     organization: '重庆城投智慧消防科技有限公司',
@@ -20,80 +20,196 @@
   ],
   dashboard: {
     metricCards: [
-      { label: '客户总数', value: '86', sub: '重点客户 26 家', route: '/pc/customer/archive' },
-      { label: '项目总数', value: '128', sub: '本年新增 18 个', route: '/pc/project/archive' },
+      { label: '客户总数', value: '86', sub: '本月新增 26 家', route: '/pc/customer/archive' },
+      { label: '项目总数', value: '128', sub: '本月新增 18 个', route: '/pc/project/archive' },
       { label: '在建项目数', value: '47', sub: '正常推进 39 个', route: '/pc/project/archive' },
       { label: '设备在线数', value: '6,842', sub: '在线率 97.6%', route: '/pc/asset/device' },
-      { label: '告警数', value: '13', sub: '一级告警 3 条', route: '/pc/asset/alarm', tone: 'danger' },
+      { label: '告警数', value: '13', sub: '较昨日 -3', route: '/pc/asset/alarm', tone: 'danger' },
       { label: '合同总额', value: '¥1.87 亿', sub: '年度新签 ¥4,260 万', route: '/pc/contract/list' },
-      { label: '本月回款', value: '¥368.5 万', sub: '完成率 72%', route: '/pc/finance/receipt' }
+      { label: '本月回款', value: '¥368.5 万', sub: '月度环比 +72%', route: '/pc/finance/receipt' }
     ],
     customerScaleChart: {
-      title: { text: '客户规模分析' },
+      title: { text: '' },
       tooltip: {},
-      xAxis: { data: ['政府单位', '国企客户', '平台公司', '事业单位', '园区客户'] },
-      series: [
-        { type: 'bar', name: '已签约', stack: 'total', data: [12, 18, 11, 9, 7] },
-        { type: 'bar', name: '重点跟进', stack: 'total', data: [6, 9, 8, 5, 4] },
-        { type: 'bar', name: '储备商机', stack: 'total', data: [4, 7, 5, 3, 2] }
-      ]
-    },
+        legend: { top: 'top', right: 16 },
+        xAxis: { data: ['微型企业', '小型企业', '中型企业', '大型企业'] },
+        series: [
+          { type: 'bar', name: '预客户', stack: 'total', color: '#4f8cff', data: [18, 26, 15, 8] },
+          { type: 'bar', name: '准客户', stack: 'total', color: '#27c56d', data: [9, 13, 7, 4] },
+          { type: 'bar', name: '签约客户', stack: 'total', color: '#f5a623', data: [6, 9, 5, 2] }
+        ]
+      },
+    customerScaleSummary: [
+      { label: '客户覆盖', value: '122 家' },
+      { label: '已签约', value: '67 家' },
+      { label: '重点跟进', value: '33 家' },
+      { label: '储备商机', value: '22 家' }
+    ],
     customerChannelChart: {
-      title: { text: '来源渠道分析' },
+      title: { text: '' },
       tooltip: {},
       xAxis: { type: 'value' },
-      yAxis: { data: ['集团转介', '政府招投标', '存量续签', '老客户转介绍', '渠道合作'] },
+      yAxis: { data: ['客户推荐', '合作伙伴介绍', '电话销售', '社交媒体广告', '线下展会', '陌生拜访'] },
       series: [
-        { type: 'bar', name: '签约客户', data: [16, 21, 18, 14, 9] }
+        { type: 'bar', name: '签约客户', data: [22, 19, 18, 16, 14, 12] }
       ]
     },
+    customerChannelSummary: [
+      { label: '渠道类型', value: '6 类' },
+      { label: '本月新增线索', value: '101 条' },
+      { label: '主力渠道', value: '客户推荐' },
+      { label: '合作转化', value: '18.8%' }
+    ],
     projectStatusChart: {
-      title: { text: '项目状态分析' },
+      title: { text: '' },
       tooltip: {},
       series: [
-        { type: 'pie', data: [
-          { name: '在建实施', value: 47 },
-          { name: '方案设计', value: 19 },
-          { name: '验收结算', value: 11 },
-          { name: '运维服务', value: 33 },
-          { name: '储备待启动', value: 18 }
-        ] }
+        {
+          type: 'pie',
+          donut: true,
+          center: ['70%', '54%'],
+          radius: 0.28,
+          innerRadius: 0.17,
+          centerTitle: '项目总量',
+          centerValue: '113',
+          data: [
+            { name: '待工勘', value: 28 },
+            { name: '待施工', value: 35 },
+            { name: '运营中', value: 41 },
+            { name: '冻结', value: 9 }
+          ]
+        }
+      ]
+    },
+    projectApprovalTrend30dChart: {
+      title: { text: '' },
+      tooltip: {},
+      xAxis: {
+        data: ['03/19', '03/20', '03/21', '03/22', '03/23', '03/24', '03/25', '03/26', '03/27', '03/28', '03/29', '03/30', '03/31', '04/01', '04/02', '04/03', '04/04', '04/05', '04/06', '04/07', '04/08', '04/09', '04/10', '04/11', '04/12', '04/13', '04/14', '04/15', '04/16', '04/17'],
+        labelStep: 5
+      },
+      series: [
+        {
+          type: 'line',
+          name: '立项数量',
+          color: '#28d7ff',
+          lineWidth: 4,
+          lineGlow: 0.24,
+          pointRadius: 4.5,
+          showValueLabel: false,
+          areaStyle: {},
+          areaAlphaStart: 0.32,
+          areaAlphaEnd: 0.03,
+          areaOpacity: 0.22,
+          emphasisPoints: [
+            { index: 14, label: '峰值', stroke: '#5ef2ff', fill: '#8cf7ff' },
+            { index: 29, label: '今日', stroke: '#ffd36a', fill: '#ffd36a' }
+          ],
+          data: [1, 2, 1, 3, 2, 2, 4, 3, 2, 5, 3, 4, 2, 3, 6, 4, 5, 3, 2, 4, 5, 4, 6, 3, 2, 4, 5, 6, 4, 3]
+        }
       ]
     },
     deviceStatusChart: {
-      title: { text: '设备使用/空闲状态' },
+      title: { text: '' },
       tooltip: {},
       series: [
-        { type: 'pie', data: [
-          { name: '在线运行', value: 6842 },
-          { name: '仓储空闲', value: 1260 },
-          { name: '维修中', value: 84 },
-          { name: '待报废', value: 27 }
-        ] }
+        {
+          type: 'pie',
+          donut: true,
+          center: ['67%', '55%'],
+          radius: 0.26,
+          innerRadius: 0.15,
+          centerTitle: '业务状态',
+          centerValue: '8213',
+          data: [
+            { name: '在线运行', value: 6842 },
+            { name: '仓储空闲', value: 1260 },
+            { name: '维修中', value: 84 },
+            { name: '待报废', value: 27 }
+          ]
+        }
+      ]
+    },
+    deviceOnlineOfflineChart: {
+      title: { text: '' },
+      tooltip: {},
+      series: [
+        {
+          type: 'pie',
+          donut: true,
+          center: ['67%', '55%'],
+          radius: 0.26,
+          innerRadius: 0.15,
+          centerTitle: '在线率',
+          centerValue: '83.3%',
+          data: [
+            {
+              name: '在线',
+              value: 6842,
+              tooltipLines: ['设备总数：6,842', '海湾：2,180 / 312', '青鸟：1,946 / 268', '利达：1,504 / 196', '泛海三江：1,212 / 121']
+            },
+            {
+              name: '离线',
+              value: 1371,
+              tooltipLines: ['设备总数：1,371', '海湾：312', '青鸟：268', '利达：196', '泛海三江：121', '其他：474']
+            }
+          ]
+        }
       ]
     },
     deviceCategoryChart: {
-      title: { text: '设备分类统计' },
+      title: { text: '' },
       tooltip: {},
-      xAxis: { data: ['火灾报警', '喷淋系统', '消火栓系统', '广播系统', '电源监控', '应急照明'] },
-      series: [
-        { type: 'bar', name: '设备数量', data: [1820, 1360, 920, 780, 465, 610] }
-      ]
-    },
+        legend: { show: false },
+        xAxis: { data: ['用户信息传输装置', '一体式压力传感器', '一体式液位传感器', '离岗检测摄像机', '消防通道监测摄像机', '电气火灾报警器', '挂箱', '交换机'] },
+        series: [
+          { type: 'bar', name: '海湾', stack: 'supplier', color: '#4f8cff', data: [320, 280, 210, 160, 150, 240, 190, 140] },
+          { type: 'bar', name: '青鸟', stack: 'supplier', color: '#2fd17b', data: [280, 230, 180, 140, 130, 210, 150, 120] },
+          { type: 'bar', name: '利达', stack: 'supplier', color: '#31c7ff', data: [240, 220, 160, 120, 110, 180, 130, 105] },
+          { type: 'bar', name: '泛海三江', stack: 'supplier', color: '#f5a623', data: [210, 190, 140, 100, 92, 155, 110, 90] },
+          { type: 'bar', name: '其他', stack: 'supplier', color: '#8a94a8', data: [150, 120, 95, 80, 76, 115, 85, 70] }
+        ]
+      },
     contractTrendChart: {
-      title: { text: '合同签订趋势' },
+      title: { text: '' },
       tooltip: {},
-      xAxis: { data: ['1月', '2月', '3月', '4月', '5月', '6月'] },
+      xAxis: { data: ['已签约', '已付款', '付款完成'] },
       series: [
-        { type: 'line', name: '签订金额', data: [860, 1420, 1180, 2260, 1950, 2480] }
+        {
+          type: 'bar',
+          name: '合同数量',
+          tooltipLines: [
+            ['合同数量：36', '合同金额：¥4,860 万'],
+            ['合同数量：27', '合同金额：¥3,420 万'],
+            ['合同数量：18', '合同金额：¥2,180 万']
+          ],
+          data: [36, 27, 18]
+        }
       ]
     },
     invoiceTrendChart: {
-      title: { text: '开票金额趋势' },
-      tooltip: {},
-      xAxis: { data: ['1月', '2月', '3月', '4月', '5月', '6月'] },
+      title: { text: '' },
+      tooltip: { trigger: 'axis' },
+      legend: { top: 'top', right: 16 },
+      xAxis: { type: 'category', data: ['1月', '2月', '3月', '4月', '5月', '6月'] },
+      yAxis: [
+        {
+          type: 'value',
+          name: '金额（万元）',
+          position: 'left'
+        },
+        {
+          type: 'value',
+          name: '数量（份）',
+          position: 'right'
+        }
+      ],
       series: [
-        { type: 'line', name: '开票金额', areaStyle: {}, data: [520, 860, 980, 1320, 1540, 1790] }
+        { type: 'line', name: '合同金额', color: '#28d7ff', lineWidth: 4, lineGlow: 0.18, yAxisIndex: 0, data: [860, 1420, 1180, 2260, 1950, 2480] },
+        { type: 'line', name: '回款金额', color: '#25d18a', lineWidth: 4, lineGlow: 0.18, yAxisIndex: 0, data: [520, 860, 980, 1320, 1540, 1790] },
+        { type: 'line', name: '开票金额', color: '#ffb347', lineWidth: 4, lineGlow: 0.18, yAxisIndex: 0, data: [460, 790, 910, 1280, 1490, 1680] },
+        { type: 'line', name: '生产产值', color: '#8b7cff', lineWidth: 4, lineGlow: 0.18, yAxisIndex: 0, data: [680, 1180, 1260, 1890, 1720, 2160] },
+        { type: 'line', name: '合同签订数量', color: '#ffd166', lineWidth: 4, lineGlow: 0.18, yAxisIndex: 1, data: [8, 12, 11, 17, 15, 19] }
       ]
     },
     overdueSurveyOrders: [
@@ -115,7 +231,7 @@
     ]},
     { key: 'project', label: '项目管理', icon: '🏗️', children: [
       { key: 'project-archive', label: '项目档案', route: '/pc/project/archive' },
-      { key: 'project-cost', label: '项目造价', route: '/pc/project/cost' },
+      { key: 'project-cost', label: '项目报价', route: '/pc/project/cost' },
       { key: 'survey-workorder', label: '工勘工单', route: '/pc/project/survey-workorder' },
       { key: 'construction-workorder', label: '施工工单', route: '/pc/project/construction-workorder' },
       { key: 'maintenance-workorder', label: '运维工单', route: '/pc/project/maintenance-workorder' }
@@ -148,7 +264,7 @@
       { key: 'alarm', label: '告警记录', route: '/pc/asset/alarm' }
     ]},
     { key: 'finance', label: '财务管理', icon: '💹', children: [
-      { key: 'profit', label: '项目利润', route: '/pc/finance/profit' },
+      { key: 'profit', label: '项目毛利', route: '/pc/finance/profit' },
       { key: 'receipt', label: '回款记录', route: '/pc/finance/receipt' },
       { key: 'payment', label: '付款记录', route: '/pc/finance/payment' },
       { key: 'invoice', label: '开票记录', route: '/pc/finance/invoice' },
@@ -168,17 +284,24 @@
   ],
   appHomeQuickActions: [
     { label: '快速立项', icon: '◫', route: '/pc/project/archive' },
-    { label: '项目造价', icon: '¥', route: '/app/project-cost' },
     { label: '工勘申请', icon: '⌖', route: '/app/survey-workorder' },
     { label: '施工申请', icon: '⚒', route: '/app/construction-workorder' },
-    { label: '采购单', icon: '▥', route: '/app/purchase-order' },
-    { label: '设备领用', icon: '↗', route: '/app/device-receive' },
-    { label: '设备退回', icon: '↙', route: '/app/device-return' }
+    { label: '设备领用', icon: '↗', route: '/app/device-receive' }
   ],
   appHomeTasks: [
     { label: '待办工单', value: 5, route: '/app/construction-workorder' },
     { label: '待审批', value: 6, route: '/app/approval' }
   ],
+  appHomeTaskReminder: {
+    label: '待办工单',
+    total: 5,
+    route: '/app/survey-workorder',
+    items: [
+      { label: '工勘', value: 3, route: '/app/survey-workorder' },
+      { label: '施工', value: 2, route: '/app/construction-workorder' },
+      { label: '运维', value: 0, route: '/app/maintenance-workorder' }
+    ]
+  },
   appHomeGroups: [
     { title: '客户与销售', items: [
       { label: '客户档案', icon: '◌', route: '/pc/customer/archive' },
@@ -187,7 +310,7 @@
     ]},
     { title: '项目管理', items: [
       { label: '项目档案', icon: '▤', route: '/pc/project/archive' },
-      { label: '项目造价', icon: '¥', route: '/app/project-cost' },
+      { label: '项目报价', icon: '¥', route: '/app/project-cost' },
       { label: '工勘工单', icon: '⌖', route: '/app/survey-workorder' },
       { label: '施工工单', icon: '⚒', route: '/app/construction-workorder' },
       { label: '运维工单', icon: '⚙', route: '/app/maintenance-workorder' }
@@ -402,6 +525,13 @@
   ],
   projectDetailData: {
     'XM-2026-018': {
+      milestones: [
+        { label: '立项', date: '2026-03-08', status: 'done' },
+        { label: '签约', date: '2026-03-22', status: 'done' },
+        { label: '工勘', date: '2026-04-06', status: 'done' },
+        { label: '施工', date: '2026-04-12', status: 'active' },
+        { label: '回款', date: '2026-05-18', status: 'pending' }
+      ],
       basicInfo: [
         ['项目编号', 'XM-2026-018'],
         ['所属客户', '重庆江北机场集团'],
@@ -411,7 +541,6 @@
         ['销售人员', '周洋'],
         ['合同金额', '¥8,600,000'],
         ['实施周期', '2026-03-15 至 2026-09-30'],
-        ['当前进度', '42%'],
         ['设备数量', '286 台'],
         ['工单数量', '18 条'],
         ['备注', '一期重点改造货运区、航站楼消防主机及联动系统。']
@@ -430,12 +559,12 @@
         { code: 'GD-20260402-021', type: '整改工单', creator: '郑林', createTime: '2026-04-02 11:30', status: '已超期', overdue: true }
       ],
       devices: [
-        { code: 'SB-001028', name: '点型感烟火灾探测器', model: 'JTY-GD-3100', status: '在线运行' },
-        { code: 'SB-001246', name: '消防应急广播模块', model: 'YJG-MK-22', status: '安装调试' },
-        { code: 'SB-001512', name: '联动控制模块', model: 'LDK-MK-08', status: '待安装' }
+        { code: 'SB-001028', name: '点型感烟火灾探测器', category: '火灾报警设备', brand: '青鸟消防', model: 'JTY-GD-3100', installLocation: 'T1 航站楼 B1 层弱电井', status: '在线' },
+        { code: 'SB-001246', name: '消防应急广播模块', category: '广播通讯设备', brand: '海湾', model: 'YJG-MK-22', installLocation: '货运区 2 号楼广播机房', status: '离线' },
+        { code: 'SB-001512', name: '联动控制模块', category: '联动控制设备', brand: '利达', model: 'LDK-MK-08', installLocation: '停车楼消防控制室', status: '待安装' }
       ],
       contracts: [
-        { code: 'HT-2026-011', name: '江北机场消防改造施工合同', amount: '¥8,600,000', signDate: '2026-03-22', status: '履约中' }
+        { code: 'HT-2026-011', name: '江北机场消防改造施工合同', amount: '¥8,600,000', invoiceAmount: '¥5,260,000', receivedAmount: '¥3,840,000', signDate: '2026-03-22', status: '履约中' }
       ]
     }
   },
@@ -465,7 +594,7 @@
       createTime: '2026-04-06 10:30',
       status: '审批中',
       approvalRecords: [
-        { time: '2026-04-06 10:30', operator: '彭超', action: '提交', remark: '提交造价审批，申请审核主材与设备预算。' },
+        { time: '2026-04-06 10:30', operator: '彭超', action: '提交', remark: '提交报价审批，申请审核主材与设备预算。' },
         { time: '2026-04-07 09:15', operator: '李国华', action: '审批中', remark: '已进入总经办审批流程。' }
       ],
       details: [
@@ -516,7 +645,7 @@
       createTime: '2026-04-02 09:50',
       status: '已通过',
       approvalRecords: [
-        { time: '2026-04-02 09:50', operator: '周晨', action: '提交', remark: '提交运维项目季度造价清单。' },
+        { time: '2026-04-02 09:50', operator: '周晨', action: '提交', remark: '提交运维项目季度报价清单。' },
         { time: '2026-04-03 11:20', operator: '李国华', action: '同意', remark: '金额结构合理，同意执行。' }
       ],
       details: [
@@ -591,7 +720,8 @@
           { name: '高位水箱', qty: '1', valve: true, signal: '有', position: '12 号楼屋顶', remark: '需加装液位传感器' },
           { name: '室内消火栓泵', qty: '2', valve: true, signal: '有', position: '地下二层泵房', remark: '主备切换正常' },
           { name: '室外消火栓泵', qty: '1', valve: true, signal: '无', position: '室外泵房', remark: '反馈信号未接入主机' },
-          { name: '喷淋泵', qty: '2', valve: true, signal: '有', position: '地下二层泵房', remark: '运行状态正常' }
+          { name: '喷淋泵', qty: '2', valve: true, signal: '有', position: '地下二层泵房', remark: '运行状态正常' },
+          { name: '喷淋末端', qty: '18', valve: true, signal: '有', position: '各楼层走廊末端', remark: '末端压力正常' }
         ],
         newDevices: [
           { content: '用户信息传输装置', unit: '台', qty: '1', remark: '安装于消控室机柜' },
@@ -663,7 +793,8 @@
           { name: '高位水箱', qty: '1', valve: true, signal: '有', position: '航站楼屋面', remark: '需复核液位余量' },
           { name: '室内消火栓泵', qty: '2', valve: true, signal: '有', position: '动力站泵房', remark: '联动测试待夜间开展' },
           { name: '室外消火栓泵', qty: '1', valve: true, signal: '有', position: '室外泵房', remark: '正常' },
-          { name: '喷淋泵', qty: '2', valve: true, signal: '有', position: '动力站泵房', remark: '正常' }
+          { name: '喷淋泵', qty: '2', valve: true, signal: '有', position: '动力站泵房', remark: '正常' },
+          { name: '喷淋末端', qty: '16', valve: true, signal: '有', position: '航站楼各分区末端', remark: '末端试水正常' }
         ]
       },
       logs: [
@@ -784,7 +915,8 @@
           { name: '高位水箱', qty: '1', valve: true, signal: '有', position: '设备楼屋顶', remark: '正常' },
           { name: '室内消火栓泵', qty: '2', valve: true, signal: '有', position: '地下泵房', remark: '正常' },
           { name: '室外消火栓泵', qty: '1', valve: true, signal: '有', position: '室外泵房', remark: '正常' },
-          { name: '喷淋泵', qty: '2', valve: true, signal: '有', position: '地下泵房', remark: '正常' }
+          { name: '喷淋泵', qty: '2', valve: true, signal: '有', position: '地下泵房', remark: '正常' },
+          { name: '喷淋末端', qty: '12', valve: true, signal: '有', position: '园区各楼栋末端', remark: '末端压力正常' }
         ],
         newDevices: [
           { content: '用户信息传输装置', unit: '台', qty: '1', remark: '新装' },
@@ -1013,11 +1145,11 @@
     statuses: ['启用', '禁用']
   },
   engineerTeamList: [
-    { id: 'GZ-001', name: '项目一组', ownerId: 'GC-001', ownerName: '彭超', status: '启用', desc: '负责重点改造项目统筹推进、现场协调与验收组织。', createTime: '2026-01-10 09:10', memberIds: ['GC-001'] },
-    { id: 'GZ-002', name: '项目二组', ownerId: 'GC-002', ownerName: '杨辉', status: '启用', desc: '负责施工组织、夜间窗口作业与现场安全管控。', createTime: '2026-01-10 09:40', memberIds: ['GC-002'] },
-    { id: 'GZ-003', name: '勘察组', ownerId: 'GC-003', ownerName: '刘健', status: '启用', desc: '负责现场工勘、点位复核、方案落位与工程量核验。', createTime: '2026-01-11 10:00', memberIds: ['GC-003'] },
-    { id: 'GZ-004', name: '运维组', ownerId: 'GC-004', ownerName: '郑林', status: '启用', desc: '负责运维巡检、故障处置、告警响应和备件更换。', createTime: '2026-01-11 10:25', memberIds: ['GC-004'] },
-    { id: 'GZ-005', name: '安装组', ownerId: 'GC-005', ownerName: '张瑶', status: '禁用', desc: '负责设备安装、桥架整改、模块上墙和联调支持。', createTime: '2026-01-11 10:50', memberIds: ['GC-005'] }
+    { id: 'GZ-001', name: '项目一组', ownerId: 'GC-001', ownerName: '彭超', status: '启用', laborCost: '¥650/台', surveyLaborCost: '12次', desc: '负责重点改造项目统筹推进、现场协调与验收组织。', createTime: '2026-01-10 09:10', memberIds: ['GC-001'] },
+    { id: 'GZ-002', name: '项目二组', ownerId: 'GC-002', ownerName: '杨辉', status: '启用', laborCost: '¥720/台', surveyLaborCost: '8次', desc: '负责施工组织、夜间窗口作业与现场安全管控。', createTime: '2026-01-10 09:40', memberIds: ['GC-002'] },
+    { id: 'GZ-003', name: '勘察组', ownerId: 'GC-003', ownerName: '刘健', status: '启用', laborCost: '¥580/台', surveyLaborCost: '20次', desc: '负责现场工勘、点位复核、方案落位与工程量核验。', createTime: '2026-01-11 10:00', memberIds: ['GC-003'] },
+    { id: 'GZ-004', name: '运维组', ownerId: 'GC-004', ownerName: '郑林', status: '启用', laborCost: '¥620/台', surveyLaborCost: '6次', desc: '负责运维巡检、故障处置、告警响应和备件更换。', createTime: '2026-01-11 10:25', memberIds: ['GC-004'] },
+    { id: 'GZ-005', name: '安装组', ownerId: 'GC-005', ownerName: '张瑶', status: '禁用', laborCost: '¥600/台', surveyLaborCost: '5次', desc: '负责设备安装、桥架整改、模块上墙和联调支持。', createTime: '2026-01-11 10:50', memberIds: ['GC-005'] }
   ],
   vehicleLogOptions: {
     users: ['彭超', '杨辉', '刘健', '郑林', '张瑶'],
@@ -1115,14 +1247,14 @@
     categories: ['用户信息传输装置', '一体式压力传感器', '一体式液位传感器', '离岗检测摄像机', '消防通道监测摄像机', '电气火灾报警器', '挂箱', '交换机']
   },
   modelList: [
-    { id: 'MX-001', brand: '安消智联', model: 'TX3000-4G', category: '用户信息传输装置', unit: '台', status: '启用', remark: '' },
-    { id: 'MX-002', brand: '博控', model: 'YL-20/1.6MPa', category: '一体式压力传感器', unit: '台', status: '启用', remark: '' },
-    { id: 'MX-003', brand: '博控', model: 'YW-10M', category: '一体式液位传感器', unit: '台', status: '启用', remark: '' },
-    { id: 'MX-004', brand: '宇视', model: 'AI-CAM-LG300', category: '离岗检测摄像机', unit: '台', status: '启用', remark: '' },
-    { id: 'MX-005', brand: '宇视', model: 'AI-CAM-TD600', category: '消防通道监测摄像机', unit: '台', status: '启用', remark: '' },
-    { id: 'MX-006', brand: '海湾', model: 'GST-DQ-01', category: '电气火灾报警器', unit: '台', status: '启用', remark: '' },
-    { id: 'MX-007', brand: '安消智联', model: 'HX-BOX-01', category: '挂箱', unit: '台', status: '启用', remark: '' },
-    { id: 'MX-008', brand: '华三', model: 'SW-16GE-POE', category: '交换机', unit: '台', status: '启用', remark: '' }
+    { id: 'MX-001', brand: '安消智联', model: 'TX3000-4G', category: '用户信息传输装置', lowStockWarning: '20', unit: '台', status: '启用', remark: '' },
+    { id: 'MX-002', brand: '博控', model: 'YL-20/1.6MPa', category: '一体式压力传感器', lowStockWarning: '', unit: '台', status: '启用', remark: '' },
+    { id: 'MX-003', brand: '博控', model: 'YW-10M', category: '一体式液位传感器', lowStockWarning: '15', unit: '台', status: '启用', remark: '' },
+    { id: 'MX-004', brand: '宇视', model: 'AI-CAM-LG300', category: '离岗检测摄像机', lowStockWarning: '2', unit: '台', status: '启用', remark: '' },
+    { id: 'MX-005', brand: '宇视', model: 'AI-CAM-TD600', category: '消防通道监测摄像机', lowStockWarning: '10', unit: '台', status: '启用', remark: '' },
+    { id: 'MX-006', brand: '海湾', model: 'GST-DQ-01', category: '电气火灾报警器', lowStockWarning: '', unit: '台', status: '启用', remark: '' },
+    { id: 'MX-007', brand: '安消智联', model: 'HX-BOX-01', category: '挂箱', lowStockWarning: '5', unit: '台', status: '启用', remark: '' },
+    { id: 'MX-008', brand: '华三', model: 'SW-16GE-POE', category: '交换机', lowStockWarning: '12', unit: '台', status: '启用', remark: '' }
   ],
     deviceArchiveOptions: {
       statuses: ['在用设备', '闲置设备', '返修设备', '报废中设备', '已报废设备']
@@ -1308,12 +1440,12 @@
     { id: 'TZ-003', name: '两江产业投资基金', type: '其他', contact: '王志峰', phone: '13611880009', amount: '¥18,500,000', status: '冻结', remark: '支持园区运维及设备更新。' }
   ],
   projectProfitList: [
-    { id: 'LR-001', projectName: '江北区智慧消防设施改造项目', income: '8600000', cost: '7120000', grossProfit: '1480000', margin: '17.2%', warning: '正常' },
-    { id: 'LR-002', projectName: '渝中区旧改消防联网项目', income: '12400000', cost: '11160000', grossProfit: '1240000', margin: '10.0%', warning: '超预算预警' },
-    { id: 'LR-003', projectName: '两江新区产业园消防运维项目', income: '5350000', cost: '3920000', grossProfit: '1430000', margin: '26.7%', warning: '正常' }
+    { id: 'LR-001', projectName: '江北区智慧消防设施改造项目', income: '8600000', cost: '7120000', grossProfit: '1480000', productionValue: '¥6,920,000', warning: '正常' },
+    { id: 'LR-002', projectName: '渝中区旧改消防联网项目', income: '12400000', cost: '11160000', grossProfit: '1240000', productionValue: '¥3,180,000', warning: '超预算预警' },
+    { id: 'LR-003', projectName: '两江新区产业园消防运维项目', income: '5350000', cost: '3920000', grossProfit: '1430000', productionValue: '¥2,860,000', warning: '正常' }
   ],
   receiptList: [
-    { id: 'HK-202604-001', contractId: 'HT-2026-011', contractName: 'HT-2026-011', projectName: '江北区智慧消防设施改造项目', customerName: '重庆江北机场集团', payerName: '重庆江北机场集团', payerAccount: '5001012000890001123', amount: '¥1,860,000.00', date: '2026-04-03', method: '订金', voucherImage: '回款凭证-001.jpg', operator: '财务专员', remark: '阶段回款一' },
+    { id: 'HK-202604-001', contractId: 'HT-2026-011', contractName: 'HT-2026-011', projectName: '江北区智慧消防设施改造项目', customerName: '重庆江北机场集团', payerName: '重庆江北机场集团', payerAccount: '5001012000890001123', amount: '¥1,860,000.00', date: '2026-04-03', method: '预付款', voucherImage: '回款凭证-001.jpg', operator: '财务专员', remark: '阶段回款一' },
     { id: 'HK-202604-002', contractId: 'HT-2026-016', contractName: 'HT-2026-016', projectName: '渝中区旧改消防联网项目', customerName: '渝中区城市更新中心', payerName: '渝中区城市更新中心', payerAccount: '5001039000123008876', amount: '¥920,000.00', date: '2026-04-06', method: '尾款', voucherImage: '', operator: '财务专员', remark: '首期预付款' }
   ],
   paymentList: [
